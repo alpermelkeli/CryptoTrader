@@ -15,12 +15,15 @@
         android:theme="@style/Theme.CryptoTrader"
         tools:targetApi="31">
         <activity
+            android:name=".ui.HomeScreen.fragments.homefragment.BotDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.LoginScreen.LoginRegister"
             android:exported="false" />
-        <activity android:name=".ui.HomeScreen.HomeScreen"
+        <activity
+            android:name=".ui.HomeScreen.HomeScreen"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">

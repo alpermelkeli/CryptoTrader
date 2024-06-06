@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.HomeScreen.fragments.HomeFragment"
+    tools:context=".ui.HomeScreen.fragments.homefragment.HomeFragment"
     android:background="#1C1718"
     >
 
@@ -47,6 +47,7 @@
             android:id="@+id/profileImage"
             android:layout_width="44dp"
             android:layout_height="35dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="16dp"
             android:src="@drawable/btc_vector"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
@@ -77,14 +78,16 @@
 
             <TextView
                 android:id="@+id/accountBalanceUsdtText"
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="38dp"
+                android:gravity="center_vertical"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="25dp"
+                android:layout_marginEnd="25dp"
                 android:fontFamily="@font/epilogue_semibold"
-                android:text="121232 USDT"
+                android:text=""
                 android:textColor="@color/white"
-                android:textSize="28dp" />
+                android:textSize="20sp" />
 
         </LinearLayout>
 

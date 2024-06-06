@@ -4,11 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alpermelkeli.cryptotrader.databinding.ActivityMainBinding
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
 import com.alpermelkeli.cryptotrader.ui.LoginScreen.LoginRegister
 
 class MainActivity : AppCompatActivity() {

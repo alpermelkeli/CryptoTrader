@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.HomeFragment"
+        android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.ProfileFragment"
+        android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.profilefragment.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>

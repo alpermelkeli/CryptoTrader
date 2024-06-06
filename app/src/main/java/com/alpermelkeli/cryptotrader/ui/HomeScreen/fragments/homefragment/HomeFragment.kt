@@ -1,6 +1,7 @@
-package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments
+package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,17 +12,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.R
 import com.alpermelkeli.cryptotrader.databinding.FragmentHomeBinding
 import com.alpermelkeli.cryptotrader.model.TradingBot
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter.TradingBotsAdapter
-/**
- * A Fragment representing the home screen of the CryptoTrader app.
- * This Fragment displays a list of trading bots and allows users to add new bots.
- */
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 class HomeFragment : Fragment() {
-    // Private properties
     private lateinit var binding: FragmentHomeBinding
     private lateinit var tradingBots: MutableList<TradingBot>
     private lateinit var adapter: TradingBotsAdapter
-    private val botManagers = mutableMapOf<String, BotManager>() // Bot yönetim sınıflarını saklamak için
+    private val botManagers = mutableMapOf<String, BotManager>()
+    private val binanceAccountOperations = BinanceAccountOperations()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,12 +33,15 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(layoutInflater)
         setupRecyclerView()
         setupButtonListeners()
+        updateAccountBalance()
         return binding.root
     }
 
     private fun setupRecyclerView() {
         tradingBots = mutableListOf()
-        adapter = TradingBotsAdapter(tradingBots)
+        adapter = TradingBotsAdapter(tradingBots) { tradingBot ->
+            openBotDetailsActivity(tradingBot)
+        }
         binding.manuelBotsRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.manuelBotsRecyclerView.adapter = adapter
     }
@@ -45,9 +51,7 @@ class HomeFragment : Fragment() {
             showAddBotDialog()
         }
     }
-    /**
-     * Displays an AlertDialog for adding a new trading bot.
-     */
+
     private fun showAddBotDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_bot, null)
         val pairNameEditText = dialogView.findViewById<EditText>(R.id.pairNameEditText)
@@ -74,16 +78,25 @@ class HomeFragment : Fragment() {
 
         dialog.show()
     }
-    /**
-     * Starts a new trading bot with the specified parameters.
-     *
-     * @param pairName  The name of the trading pair for the bot.
-     * @param threshold The trading threshold for the bot.
-     * @param amount    The trading amount for the bot.
-     */
+
     private fun startTradingBot(pairName: String, threshold: Double, amount: Double) {
-        val botManager = BotManager(pairName, threshold, amount)
+        val botManager = BotManager(requireContext(), pairName, threshold, amount)
         botManagers[pairName] = botManager
         botManager.start()
+    }
+
+    private fun updateAccountBalance() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val balance = binanceAccountOperations.accountBalance
+            withContext(Dispatchers.Main) {
+                binding.accountBalanceUsdtText.text = "%.2f USDT".format(balance)
+            }
+        }
+    }
+
+    private fun openBotDetailsActivity(tradingBot: TradingBot) {
+        val intent = Intent(context, BotDetailsActivity::class.java)
+        intent.putExtra("pairName", tradingBot.pairName)
+        startActivity(intent)
     }
 }
