@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 public class BinanceAccountOperations implements AccountOperations {
     private static final String API_URL = "https://testnet.binance.vision/api/v3/account";
-    private static final String API_KEY = "esKxU7EkO2VH89yp0KZT50fHTfIE2CdWnyPib5y9ei4SW8DAatIQgUajThHe2ErJ";
-    private static final String API_SECRET = "4UDPYEEv91UY5OW1sFQxmlbDAn577zDdoPWbjaBfwCg76Og0MeNsfcYtJoWN69Jb";
+    private static final String API_KEY = "w2iP6cgc0S7SGzrvnMEWHXKVJd28V3Ypm26Xgi1biiVtn4gL4XsbqbJAnmGqYE13";
+    private static final String API_SECRET = "78ME1ndU0KcvMKWsSwQcF9y63nvMWrP32nYjIbKBOZoGbldYDpZPvaFCR55qiXCg";
 
     private final OkHttpClient client = new OkHttpClient();
 

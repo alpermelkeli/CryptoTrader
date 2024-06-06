@@ -14,8 +14,9 @@ import java.util.Base64;
 
 public class BinanceExchangeOperations implements ExchangeOperations {
 
-    private static final String API_KEY = "esKxU7EkO2VH89yp0KZT50fHTfIE2CdWnyPib5y9ei4SW8DAatIQgUajThHe2ErJ";
-    private static final String SECRET_KEY = "4UDPYEEv91UY5OW1sFQxmlbDAn577zDdoPWbjaBfwCg76Og0MeNsfcYtJoWN69Jb";
+
+    private static final String API_KEY = "w2iP6cgc0S7SGzrvnMEWHXKVJd28V3Ypm26Xgi1biiVtn4gL4XsbqbJAnmGqYE13";
+    private static final String SECRET_KEY = "78ME1ndU0KcvMKWsSwQcF9y63nvMWrP32nYjIbKBOZoGbldYDpZPvaFCR55qiXCg";
     private static final String BASE_URL = "https://testnet.binance.vision/api";
 
     private final OkHttpClient client;
