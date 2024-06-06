@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CryptoTrader</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_login_register">LoginRegisterActivity</string>
+</resources>
