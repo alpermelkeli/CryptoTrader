@@ -1,39 +1,40 @@
-package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment
 import android.content.Context
-import android.widget.Toast
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 
 class BotManager(
-    private val context: Context?,
+    private val context: Context,
     private val pairName: String,
-    private val threshold: Double,
-    private val amount: Double
+     val threshold: Double,
+    val amount: Double
 ) {
-    private val exchangeOperations = BinanceExchangeOperations()
-    private val thresholdManager = ThresholdManager()
-    private var openPosition = false
+    private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
+    private val thresholdManager: ThresholdManager = ThresholdManager()
+    private var openPosition: Boolean = false
+    private var webSocketManager: BinanceWebSocketManager? = null
 
     fun start() {
         thresholdManager.setBuyThreshold(pairName, threshold)
-
-        val listener = object : BinanceWebSocketManager.BinanceWebSocketListener() {
+        val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
             override fun onPriceUpdate(price: String) {
                 val currentPrice = price.toDouble()
                 handlePriceUpdate(currentPrice)
             }
         }
+        webSocketManager = BinanceWebSocketManager(listener)
+        webSocketManager!!.connect(pairName)
+    }
 
-        val webSocketManager = BinanceWebSocketManager(listener)
-        webSocketManager.connect(pairName)
+    fun stop() {
+        webSocketManager?.disconnect()
     }
 
     private fun handlePriceUpdate(currentPrice: Double) {
         val buyThreshold = thresholdManager.getBuyThreshold(pairName)
         val sellThreshold = thresholdManager.getSellThreshold(pairName)
 
-        // Print the current thresholds
         println("Current price of $pairName = $currentPrice")
         println("Buy threshold of $pairName = $buyThreshold")
         println("Sell threshold of $pairName = $sellThreshold")
@@ -46,10 +47,9 @@ class BotManager(
                 thresholdManager.setSellThreshold(pairName, buyThreshold)
                 thresholdManager.removeBuyThreshold(pairName)
             } catch (e: Exception) {
-                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show() // Use context to show toast
+                e.printStackTrace()
             }
         }
-
         if (openPosition && sellThreshold != null && currentPrice < sellThreshold) {
             exchangeOperations.sellCoin(pairName, amount)
             openPosition = false

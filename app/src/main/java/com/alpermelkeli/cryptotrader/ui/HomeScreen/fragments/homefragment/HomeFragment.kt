@@ -1,17 +1,20 @@
 package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment
 
+import BotManager
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.R
 import com.alpermelkeli.cryptotrader.databinding.FragmentHomeBinding
 import com.alpermelkeli.cryptotrader.model.TradingBot
+import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter.TradingBotsAdapter
 import kotlinx.coroutines.CoroutineScope
@@ -23,13 +26,14 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var tradingBots: MutableList<TradingBot>
     private lateinit var adapter: TradingBotsAdapter
+    private lateinit var binanceAccountOperations: BinanceAccountOperations
     private val botManagers = mutableMapOf<String, BotManager>()
-    private val binanceAccountOperations = BinanceAccountOperations()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binanceAccountOperations = BinanceAccountOperations()
         binding = FragmentHomeBinding.inflate(layoutInflater)
         setupRecyclerView()
         setupButtonListeners()
@@ -82,7 +86,17 @@ class HomeFragment : Fragment() {
     private fun startTradingBot(pairName: String, threshold: Double, amount: Double) {
         val botManager = BotManager(requireContext(), pairName, threshold, amount)
         botManagers[pairName] = botManager
-        botManager.start()
+
+        val intent = Intent(context, BotService::class.java).apply {
+            action = "START_BOT"
+            putExtra("pairName", pairName)
+            putExtra("threshold", threshold)
+            putExtra("amount", amount)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().startForegroundService(intent)
+        }
+
     }
 
     private fun updateAccountBalance() {
@@ -93,10 +107,13 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
     private fun openBotDetailsActivity(tradingBot: TradingBot) {
         val intent = Intent(context, BotDetailsActivity::class.java)
         intent.putExtra("pairName", tradingBot.pairName)
         startActivity(intent)
     }
+
+
+
 }
+
