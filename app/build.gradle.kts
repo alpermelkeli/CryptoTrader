@@ -48,6 +48,7 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.sqlite:sqlite:2.1.0")
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")

@@ -1,6 +1,6 @@
 package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment
 
-import BotManager
+import com.alpermelkeli.cryptotrader.model.BotManager
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
@@ -22,10 +22,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
+    /**
+     * It's just for the view.
+     */
     private lateinit var tradingBots: MutableList<TradingBot>
     private lateinit var adapter: TradingBotsAdapter
     private lateinit var binanceAccountOperations: BinanceAccountOperations
@@ -37,6 +42,7 @@ class HomeFragment : Fragment() {
     ): View? {
         binanceAccountOperations = BinanceAccountOperations()
         binding = FragmentHomeBinding.inflate(layoutInflater)
+        BotManagerStorage.initialize(requireContext())
         setupRecyclerView()
         setupButtonListeners()
         updateAccountBalance()
@@ -44,7 +50,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        /**
+         * Firstly get data from database and insert it.
+         */
         tradingBots = mutableListOf()
+
+        for((id,botManager) in BotManagerStorage.getBotManagers()){
+            tradingBots.add(TradingBot(id,R.drawable.btc_vector,"BINANCE","Active",botManager.firstPairName,botManager.secondPairName,botManager.pairName))
+        }
+
         adapter = TradingBotsAdapter(tradingBots) { tradingBot ->
             openBotDetailsActivity(tradingBot)
         }
@@ -60,7 +74,8 @@ class HomeFragment : Fragment() {
 
     private fun showAddBotDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_bot, null)
-        val pairNameEditText = dialogView.findViewById<EditText>(R.id.pairNameEditText)
+        val firstPairNameEditText = dialogView.findViewById<EditText>(R.id.firstPairEditText)
+        val secondPairNameEditText = dialogView.findViewById<EditText>(R.id.secondPairEditText)
         val thresholdEditText = dialogView.findViewById<EditText>(R.id.thresholdEditText)
         val amountEditText = dialogView.findViewById<EditText>(R.id.amountEditText)
 
@@ -69,22 +84,34 @@ class HomeFragment : Fragment() {
             .setView(dialogView)
             .setPositiveButton("Ekle") { _, _ ->
                 checkAndRequestForegroundServicePermission()
-
-                val pairName = pairNameEditText.text.toString()
+                val firstPairName = firstPairNameEditText.text.toString()
+                val secondPairName = secondPairNameEditText.text.toString()
+                val pairName =  firstPairName + secondPairName
                 val threshold = thresholdEditText.text.toString().toDoubleOrNull()
                 val amount = amountEditText.text.toString().toDoubleOrNull()
 
                 if (pairName.isNotEmpty() && threshold != null && amount != null) {
-                    val newBot = TradingBot(R.drawable.btc_vector, "BINANCE", "Aktif", pairName)
+                    val id = generateBotId()
+                    val newBot = TradingBot(id,R.drawable.btc_vector, "BINANCE", "Aktif", firstPairName,secondPairName,pairName)
+
                     tradingBots.add(newBot)
+
                     adapter.notifyItemInserted(tradingBots.size - 1)
-                    startTradingBot(pairName, threshold, amount)
+
+                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount)
+
+                    BotManagerStorage.addBotManager(botManager)
+
+                    startTradingBot(id,firstPairName,secondPairName,pairName, threshold, amount)
                 }
             }
             .setNegativeButton("İptal", null)
             .create()
 
         dialog.show()
+    }
+    private fun generateBotId(): String {
+        return "BOT_" + System.currentTimeMillis().toString()
     }
     private fun checkAndRequestForegroundServicePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -134,9 +161,12 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    private fun startTradingBot(pairName: String, threshold: Double, amount: Double) {
+    private fun startTradingBot(id:String,firstPairName: String,secondPairName: String,pairName: String, threshold: Double, amount: Double) {
         val intent = Intent(context, BotService::class.java).apply {
             action = "START_BOT"
+            putExtra("id", id)
+            putExtra("firstPairName",firstPairName)
+            putExtra("secondPairName",secondPairName)
             putExtra("pairName", pairName)
             putExtra("threshold", threshold)
             putExtra("amount", amount)
@@ -155,7 +185,9 @@ class HomeFragment : Fragment() {
     }
     private fun openBotDetailsActivity(tradingBot: TradingBot) {
         val intent = Intent(context, BotDetailsActivity::class.java)
-        intent.putExtra("pairName", tradingBot.pairName)
+        intent.putExtra("id", tradingBot.id)
+        intent.putExtra("firstPairName",tradingBot.firstPairName)
+        intent.putExtra("secondPairName",tradingBot.secondPairName)
         startActivity(intent)
     }
 

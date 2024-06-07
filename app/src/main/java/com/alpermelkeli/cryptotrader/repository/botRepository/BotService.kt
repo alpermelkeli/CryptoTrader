@@ -1,6 +1,7 @@
 package com.alpermelkeli.cryptotrader.repository.botRepository
 
-import BotManager
+import com.alpermelkeli.cryptotrader.model.BotManager
+import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -16,7 +17,7 @@ import com.alpermelkeli.cryptotrader.R
 import com.alpermelkeli.cryptotrader.ui.MainActivity
 
 class BotService : Service() {
-    private val botManagers: MutableMap<String, BotManager> = mutableMapOf()
+    private val botManagers =  BotManagerStorage.getBotManagers()
 
     override fun onCreate() {
         super.onCreate()
@@ -27,10 +28,13 @@ class BotService : Service() {
         val action = intent.action
         when (action) {
             "START_BOT" -> {
+                val botID = intent.getStringExtra("id")!!
+                val firstPairName = intent.getStringExtra("firstPairName")!!
+                val secondPairName = intent.getStringExtra("secondPairName")!!
                 val pairName = intent.getStringExtra("pairName")!!
                 val threshold = intent.getDoubleExtra("threshold", 0.0)
                 val amount = intent.getDoubleExtra("amount", 0.0)
-                startBot(pairName, threshold, amount)
+                startBot(botID,firstPairName,secondPairName,pairName, threshold, amount)
             }
             "STOP_BOT" -> {
                 val pairName = intent.getStringExtra("pairName")!!
@@ -77,7 +81,8 @@ class BotService : Service() {
         val activeBotInfo = StringBuilder()
 
         // Append each active bots information to the StringBuilder
-        for ((pairName, botManager) in botManagers) {
+
+        for ((id, botManager) in botManagers) {
             activeBotInfo.append(botManager.pairName).append(" Thresold: ${botManager.threshold}\n")
         }
 
@@ -95,9 +100,9 @@ class BotService : Service() {
             .build()
     }
 
-    private fun startBot(pairName: String, threshold: Double, amount: Double) {
-        val botManager = BotManager(pairName, threshold, amount)
-        botManagers[pairName] = botManager
+    private fun startBot(id:String,firstPairName: String,secondPairName: String,pairName: String, threshold: Double, amount: Double) {
+        val botManager = BotManager(id,firstPairName,secondPairName,pairName, threshold, amount)
+        botManagers[id] = botManager
         botManager.start()
     }
 

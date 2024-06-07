@@ -6,10 +6,18 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/pairNameEditText"
+        android:id="@+id/firstPairEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Pair Adı" />
+        android:ems="10"
+        android:inputType="text"
+        android:hint="1.Coin adı" />
+
+    <EditText
+        android:id="@+id/secondPairEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="2.Coin Adı" />
 
     <EditText
         android:id="@+id/thresholdEditText"

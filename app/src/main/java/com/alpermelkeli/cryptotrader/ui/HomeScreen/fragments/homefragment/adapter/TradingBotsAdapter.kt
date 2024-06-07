@@ -21,6 +21,7 @@ class TradingBotsAdapter(
 
     override fun onBindViewHolder(holder: TradingBotViewHolder, position: Int) {
         val bot = tradingBots[position]
+
         holder.coinPairName.text = bot.pairName
         holder.coinImage.setImageResource(R.drawable.btc_vector)
         holder.exchangeMarketText.text = bot.exchangeMarket

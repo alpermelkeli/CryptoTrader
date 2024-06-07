@@ -1,13 +1,17 @@
-import android.content.Context
+package com.alpermelkeli.cryptotrader.model
+
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 
 class BotManager(
+    val id:String,
+    val firstPairName: String,
+    val secondPairName:String,
     val pairName: String,
     val threshold: Double,
-    private val amount: Double
+    val amount: Double,
 ) {
     private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
     private val thresholdManager: ThresholdManager = ThresholdManager()
