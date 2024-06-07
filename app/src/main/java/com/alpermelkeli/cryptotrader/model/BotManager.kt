@@ -3,7 +3,7 @@ package com.alpermelkeli.cryptotrader.model
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
+import com.alpermelkeli.cryptotrader.repository.botRepository.ThresholdManager
 
 class BotManager(
     val id:String,
@@ -16,7 +16,8 @@ class BotManager(
     var status: String
 ) {
     private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
-    private val thresholdManager: ThresholdManager = ThresholdManager()
+    private val thresholdManager: ThresholdManager =
+        ThresholdManager()
     private var openPosition: Boolean = false
     private var webSocketManager: BinanceWebSocketManager? = null
 

@@ -15,8 +15,8 @@ import java.util.Base64;
 public class BinanceExchangeOperations implements ExchangeOperations {
 
 
-    private static final String API_KEY = "w2iP6cgc0S7SGzrvnMEWHXKVJd28V3Ypm26Xgi1biiVtn4gL4XsbqbJAnmGqYE13";
-    private static final String SECRET_KEY = "78ME1ndU0KcvMKWsSwQcF9y63nvMWrP32nYjIbKBOZoGbldYDpZPvaFCR55qiXCg";
+    private static final String API_KEY = "8lYWU5jk23jNIjTcEc9J9OLEuuyGJJ3xHqPRcBWggxPhi0IiTCaImqYDV07eqgzZ";
+    private static final String SECRET_KEY = "iTMSOfhtH0sArKkT16Iq5u1PCQFh0OLM56kSSary7AocnGt5rRhSN4yVszs7j439";
     private static final String BASE_URL = "https://testnet.binance.vision/api";
 
     private final OkHttpClient client;
@@ -86,7 +86,6 @@ public class BinanceExchangeOperations implements ExchangeOperations {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void sellCoin(String symbol, double quantity) {

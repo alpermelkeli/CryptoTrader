@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 public class BinanceAccountOperations implements AccountOperations {
     private static final String API_URL = "https://testnet.binance.vision/api/v3/account";
-    private static final String API_KEY = "w2iP6cgc0S7SGzrvnMEWHXKVJd28V3Ypm26Xgi1biiVtn4gL4XsbqbJAnmGqYE13";
-    private static final String API_SECRET = "78ME1ndU0KcvMKWsSwQcF9y63nvMWrP32nYjIbKBOZoGbldYDpZPvaFCR55qiXCg";
+    private static final String API_KEY = "8lYWU5jk23jNIjTcEc9J9OLEuuyGJJ3xHqPRcBWggxPhi0IiTCaImqYDV07eqgzZ";
+    private static final String API_SECRET = "iTMSOfhtH0sArKkT16Iq5u1PCQFh0OLM56kSSary7AocnGt5rRhSN4yVszs7j439";
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -79,6 +79,47 @@ public class BinanceAccountOperations implements AccountOperations {
             return 0.0;
         }
     }
+
+    @Override
+    public double getSelectedCoinQuantity(String asset) {
+        try {
+            long timestamp = System.currentTimeMillis();
+            String queryString = "timestamp=" + timestamp;
+            String signature = generateSignature(queryString);
+            queryString += "&signature=" + encode(signature);
+
+            HttpUrl httpUrl = HttpUrl.parse(API_URL).newBuilder().encodedQuery(queryString).build();
+
+            Request request = new Request.Builder()
+                    .url(httpUrl)
+                    .addHeader("X-MBX-APIKEY", API_KEY)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+
+                String responseBody = response.body().string();
+                JSONObject json = new JSONObject(responseBody);
+                JSONArray balances = json.getJSONArray("balances");
+
+                for (int i = 0; i < balances.length(); i++) {
+                    JSONObject balance = balances.getJSONObject(i);
+                    if (balance.getString("asset").equalsIgnoreCase(asset)) {
+                        double free = balance.getDouble("free");
+                        double locked = balance.getDouble("locked");
+                        return free + locked;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
 
 
 }

@@ -5,11 +5,18 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.alpermelkeli.cryptotrader.databinding.ActivityBotDetailsBinding
 
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 class BotDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBotDetailsBinding
 
@@ -34,6 +41,7 @@ class BotDetailsActivity : AppCompatActivity() {
             val pairName = botManager.pairName
             val amount = botManager.amount
             val threshold = botManager.threshold
+            getPairsQuantities(firstPairName,secondPairName)
             binding.botIdText.text = id
             binding.pairText.text = pairName
             binding.firstPairText.text = firstPairName
@@ -45,6 +53,23 @@ class BotDetailsActivity : AppCompatActivity() {
         binding.passiveButton.setOnClickListener { botManagerID?.let { stopTradingBot(it) } }
         binding.updateButton.setOnClickListener {  botManagerID?.let { updateTradingBot(it,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }}
     }
+
+    private fun getPairsQuantities(firstPair: String, secondPair: String) {
+        val binanceAccountOperations = BinanceAccountOperations()
+
+        lifecycleScope.launch {
+            val firstQuantity = withContext(Dispatchers.IO) {
+                binanceAccountOperations.getSelectedCoinQuantity(firstPair)
+            }
+            val secondQuantity = withContext(Dispatchers.IO) {
+                binanceAccountOperations.getSelectedCoinQuantity(secondPair)
+            }
+
+            binding.firstPairQuantityText.text = firstQuantity.toString()
+            binding.secondPairQuantityText.text = secondQuantity.toString()
+        }
+    }
+
     private fun stopTradingBot(id: String) {
         val intent = Intent(this, BotService::class.java).apply {
             action = "STOP_BOT"

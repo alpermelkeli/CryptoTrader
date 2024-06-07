@@ -1,4 +1,4 @@
-package com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance;
+package com.alpermelkeli.cryptotrader.repository.botRepository;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,6 +1,5 @@
 package com.alpermelkeli.cryptotrader.repository.botRepository
 
-import com.alpermelkeli.cryptotrader.model.BotManager
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,11 +10,9 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 import com.alpermelkeli.cryptotrader.ui.MainActivity
 
 class BotService : Service() {
@@ -111,6 +108,7 @@ class BotService : Service() {
     private fun updateBot(id: String, amount:Double, threshold: Double){
         val botManager = botManagers[id]!!
         botManager.stop()
+        botManager.status = "Active"
         botManager.amount = amount
         botManager.threshold = threshold
         botManager.start()
