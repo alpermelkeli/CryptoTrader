@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -20,18 +21,15 @@ class BotService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        Log.d("BotService", "Service created")
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val action = intent.action
-        Log.d("BotService", "Received action: $action")
         when (action) {
             "START_BOT" -> {
                 val pairName = intent.getStringExtra("pairName")!!
                 val threshold = intent.getDoubleExtra("threshold", 0.0)
                 val amount = intent.getDoubleExtra("amount", 0.0)
-                Log.d("BotService", "Starting bot with pairName: $pairName, threshold: $threshold, amount: $amount")
                 startBot(pairName, threshold, amount)
             }
             "STOP_BOT" -> {
@@ -42,7 +40,12 @@ class BotService : Service() {
         }
 
         // Start the service in the foreground
-        startForeground(1, createNotification())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        }
+        else{
+            startForeground(1, createNotification())
+        }
         return START_NOT_STICKY
     }
 
@@ -73,35 +76,34 @@ class BotService : Service() {
         // Initialize an empty StringBuilder to store active bot information
         val activeBotInfo = StringBuilder()
 
-        // Append each active bot's information to the StringBuilder
-        for ((pairName, _) in botManagers) {
-            activeBotInfo.append(pairName).append("\n")
+        // Append each active bots information to the StringBuilder
+        for ((pairName, botManager) in botManagers) {
+            activeBotInfo.append(botManager.pairName).append(" Thresold: ${botManager.threshold}\n")
         }
 
         // Create an intent to launch the MainActivity when notification is clicked
         val notificationIntent = Intent(this, MainActivity::class.java)
+
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         // Build the notification with active bot information
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Bot Service")
-            .setContentText("The bot service is running\nActive Bots:\n$activeBotInfo")
+            .setContentText("The bot running.\nActive Bots:\n$activeBotInfo")
             .setSmallIcon(R.drawable.btc_vector)
             .setContentIntent(pendingIntent)
             .build()
     }
 
     private fun startBot(pairName: String, threshold: Double, amount: Double) {
-        val botManager = BotManager(this, pairName, threshold, amount)
+        val botManager = BotManager(pairName, threshold, amount)
         botManagers[pairName] = botManager
         botManager.start()
-        Log.d("BotService", "Bot started: $pairName")
     }
 
     private fun stopBot(pairName: String) {
         botManagers[pairName]?.stop()
         botManagers.remove(pairName)
-        Log.d("BotService", "Bot stopped: $pairName")
     }
 
     companion object {

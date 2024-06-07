@@ -21,14 +21,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.Manifest
+import android.content.pm.PackageManager
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var tradingBots: MutableList<TradingBot>
     private lateinit var adapter: TradingBotsAdapter
     private lateinit var binanceAccountOperations: BinanceAccountOperations
-    private val botManagers = mutableMapOf<String, BotManager>()
-
+    private val REQUEST_FOREGROUND_PERMISSION = 1
+    private val REQUEST_DATA_SYNC_PERMISSION = 2
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -66,6 +68,8 @@ class HomeFragment : Fragment() {
             .setTitle("Yeni Bot Ekle")
             .setView(dialogView)
             .setPositiveButton("Ekle") { _, _ ->
+                checkAndRequestForegroundServicePermission()
+
                 val pairName = pairNameEditText.text.toString()
                 val threshold = thresholdEditText.text.toString().toDoubleOrNull()
                 val amount = amountEditText.text.toString().toDoubleOrNull()
@@ -82,11 +86,55 @@ class HomeFragment : Fragment() {
 
         dialog.show()
     }
+    private fun checkAndRequestForegroundServicePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (context?.checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.FOREGROUND_SERVICE), REQUEST_FOREGROUND_PERMISSION)
+            } else {
+                checkAndRequestDataSyncPermission()
+            }
+        } else {
+            checkAndRequestDataSyncPermission()
+        }
+    }
 
+    private fun checkAndRequestDataSyncPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (context?.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_DATA_SYNC_PERMISSION)
+            } else {
+            }
+        } else {
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_FOREGROUND_PERMISSION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkAndRequestDataSyncPermission()
+                } else {
+                    AlertDialog.Builder(context)
+                        .setMessage("Foreground service permission is required to start the trading bot.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            }
+            REQUEST_DATA_SYNC_PERMISSION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    AlertDialog.Builder(context)
+                        .setMessage("Data sync permission is required to start the trading bot.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            }
+        }
+    }
     private fun startTradingBot(pairName: String, threshold: Double, amount: Double) {
-        val botManager = BotManager(requireContext(), pairName, threshold, amount)
-        botManagers[pairName] = botManager
-
         val intent = Intent(context, BotService::class.java).apply {
             action = "START_BOT"
             putExtra("pairName", pairName)
@@ -96,9 +144,7 @@ class HomeFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(intent)
         }
-
     }
-
     private fun updateAccountBalance() {
         CoroutineScope(Dispatchers.IO).launch {
             val balance = binanceAccountOperations.accountBalance

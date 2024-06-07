@@ -5,10 +5,9 @@ import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSock
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 
 class BotManager(
-    private val context: Context,
-    private val pairName: String,
-     val threshold: Double,
-    val amount: Double
+    val pairName: String,
+    val threshold: Double,
+    private val amount: Double
 ) {
     private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
     private val thresholdManager: ThresholdManager = ThresholdManager()
