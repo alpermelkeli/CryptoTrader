@@ -12,8 +12,10 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.ThresholdManager
 import com.alpermelkeli.cryptotrader.ui.MainActivity
 
 class BotService : Service() {
@@ -27,10 +29,15 @@ class BotService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val action = intent.action
         val botID = intent.getStringExtra("id")!!
+        val amount = intent.getDoubleExtra("amount",0.0)
+        val threshold = intent.getDoubleExtra("threshold",0.0)
         when (action) {
 
             "START_BOT" -> {
                 startBot(botID)
+            }
+            "UPDATE_BOT"->{
+                updateBot(botID,amount,threshold)
             }
             "STOP_BOT" -> {
                 stopBot(botID)
@@ -76,7 +83,9 @@ class BotService : Service() {
         // Append each active bots information to the StringBuilder
 
         for ((id, botManager) in botManagers) {
-            activeBotInfo.append(botManager.pairName).append(" Thresold: ${botManager.threshold}\n")
+            if(botManager.status.equals("Active")){
+                activeBotInfo.append(botManager.pairName).append(" Thresold: ${botManager.threshold}\n")
+            }
         }
 
         // Create an intent to launch the MainActivity when notification is clicked
@@ -99,12 +108,20 @@ class BotService : Service() {
         botManager.status ="Active"
         BotManagerStorage.updateBotManager(id,botManager)
     }
-
+    private fun updateBot(id: String, amount:Double, threshold: Double){
+        val botManager = botManagers[id]!!
+        botManager.stop()
+        botManager.amount = amount
+        botManager.threshold = threshold
+        botManager.start()
+        BotManagerStorage.updateBotManager(id,botManager)
+    }
     private fun stopBot(id: String) {
         val botManager = botManagers[id]!!
         botManager.status="Passive"
         botManager.stop()
         BotManagerStorage.updateBotManager(id,botManager)
+        Toast.makeText(applicationContext,"Bot durduruldu",Toast.LENGTH_LONG).show()
     }
 
     companion object {

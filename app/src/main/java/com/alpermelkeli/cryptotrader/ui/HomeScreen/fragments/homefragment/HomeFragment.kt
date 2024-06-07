@@ -49,6 +49,10 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupRecyclerView()
+    }
     private fun setupRecyclerView() {
         /**
          * Firstly get data from database and insert it.
@@ -56,7 +60,7 @@ class HomeFragment : Fragment() {
         tradingBots = mutableListOf()
 
         for((id,botManager) in BotManagerStorage.getBotManagers()){
-            tradingBots.add(TradingBot(id,R.drawable.btc_vector,"BINANCE","Active",botManager.firstPairName,botManager.secondPairName,botManager.pairName))
+            tradingBots.add(TradingBot(id,R.drawable.btc_vector,botManager.exchangeMarket,botManager.status,botManager.firstPairName,botManager.secondPairName,botManager.pairName))
         }
 
         adapter = TradingBotsAdapter(tradingBots) { tradingBot ->
@@ -102,7 +106,7 @@ class HomeFragment : Fragment() {
 
                     BotManagerStorage.addBotManager(botManager)
 
-                    startTradingBot(id,firstPairName,secondPairName,pairName, threshold, amount)
+                    startTradingBot(id)
                 }
             }
             .setNegativeButton("İptal", null)
@@ -161,15 +165,11 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    private fun startTradingBot(id:String,firstPairName: String,secondPairName: String,pairName: String, threshold: Double, amount: Double) {
+    private fun startTradingBot(id:String) {
         val intent = Intent(context, BotService::class.java).apply {
             action = "START_BOT"
             putExtra("id", id)
-            putExtra("firstPairName",firstPairName)
-            putExtra("secondPairName",secondPairName)
-            putExtra("pairName", pairName)
-            putExtra("threshold", threshold)
-            putExtra("amount", amount)
+
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(intent)

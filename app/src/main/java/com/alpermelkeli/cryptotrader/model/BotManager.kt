@@ -10,8 +10,8 @@ class BotManager(
     val firstPairName: String,
     val secondPairName:String,
     val pairName: String,
-    val threshold: Double,
-    val amount: Double,
+    var threshold: Double,
+    var amount: Double,
     val exchangeMarket: String,
     var status: String
 ) {
