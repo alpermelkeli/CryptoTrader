@@ -17,16 +17,50 @@ object BotManagerStorage {
 
     fun addBotManager(botManager: BotManager) {
         botManagers[botManager.id] = botManager
-        dbHelper.insertBot(BotEntity(botManager.id, botManager.firstPairName,botManager.secondPairName,botManager.pairName, botManager.threshold, botManager.amount))
+        dbHelper.insertBot(
+            BotEntity(
+                botManager.id,
+                botManager.firstPairName,
+                botManager.secondPairName,
+                botManager.pairName,
+                botManager.threshold,
+                botManager.amount,
+                botManager.exchangeMarket,
+                botManager.status
+            )
+        )
     }
 
     fun getBotManager(id: String): BotManager? {
         return botManagers[id]
     }
+
     fun getBotManagers(): MutableMap<String, BotManager> {
         return botManagers
     }
-    fun removeBotManager(id:String){
+    fun updateBotManager(id:String, botManager: BotManager){
+
+        botManagers.remove(id)
+
+        dbHelper.removeBotById(id)
+
+        botManagers[id] = botManager
+
+        dbHelper.insertBot(
+            BotEntity(
+                botManager.id,
+                botManager.firstPairName,
+                botManager.secondPairName,
+                botManager.pairName,
+                botManager.threshold,
+                botManager.amount,
+                botManager.exchangeMarket,
+                botManager.status
+            )
+        )
+
+    }
+    fun removeBotManager(id: String) {
         botManagers.remove(id)
         dbHelper.removeBotById(id)
     }
@@ -34,9 +68,17 @@ object BotManagerStorage {
     private fun loadBotsFromDatabase() {
         val bots = dbHelper.getAllBots()
         for (bot in bots) {
-            val botManager = BotManager(bot.id, bot.firstPairName,bot.secondPairName,bot.pairName, bot.threshold, bot.amount)
+            val botManager = BotManager(
+                bot.id,
+                bot.firstPairName,
+                bot.secondPairName,
+                bot.pairName,
+                bot.threshold,
+                bot.amount,
+                bot.exchangeMarket,
+                bot.status
+            )
             botManagers[bot.id] = botManager
         }
     }
 }
-

@@ -26,24 +26,17 @@ class BotService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val action = intent.action
+        val botID = intent.getStringExtra("id")!!
         when (action) {
+
             "START_BOT" -> {
-                val botID = intent.getStringExtra("id")!!
-                val firstPairName = intent.getStringExtra("firstPairName")!!
-                val secondPairName = intent.getStringExtra("secondPairName")!!
-                val pairName = intent.getStringExtra("pairName")!!
-                val threshold = intent.getDoubleExtra("threshold", 0.0)
-                val amount = intent.getDoubleExtra("amount", 0.0)
-                startBot(botID,firstPairName,secondPairName,pairName, threshold, amount)
+                startBot(botID)
             }
             "STOP_BOT" -> {
-                val pairName = intent.getStringExtra("pairName")!!
-                Log.d("BotService", "Stopping bot with pairName: $pairName")
-                stopBot(pairName)
+                stopBot(botID)
             }
         }
 
-        // Start the service in the foreground
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(1, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         }
@@ -100,15 +93,18 @@ class BotService : Service() {
             .build()
     }
 
-    private fun startBot(id:String,firstPairName: String,secondPairName: String,pairName: String, threshold: Double, amount: Double) {
-        val botManager = BotManager(id,firstPairName,secondPairName,pairName, threshold, amount)
-        botManagers[id] = botManager
+    private fun startBot(id:String) {
+        val botManager = botManagers[id]!!
         botManager.start()
+        botManager.status ="Active"
+        BotManagerStorage.updateBotManager(id,botManager)
     }
 
-    private fun stopBot(pairName: String) {
-        botManagers[pairName]?.stop()
-        botManagers.remove(pairName)
+    private fun stopBot(id: String) {
+        val botManager = botManagers[id]!!
+        botManager.status="Passive"
+        botManager.stop()
+        BotManagerStorage.updateBotManager(id,botManager)
     }
 
     companion object {

@@ -98,7 +98,7 @@ class HomeFragment : Fragment() {
 
                     adapter.notifyItemInserted(tradingBots.size - 1)
 
-                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount)
+                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount,"BINANCE","Active")
 
                     BotManagerStorage.addBotManager(botManager)
 

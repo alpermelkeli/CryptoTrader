@@ -6,6 +6,8 @@ data class BotEntity(
     val secondPairName: String,
     val pairName: String,
     val threshold: Double,
-    val amount: Double
+    val amount: Double,
+    val exchangeMarket: String,
+    val status: String
 )
 

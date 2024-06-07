@@ -12,6 +12,8 @@ class BotManager(
     val pairName: String,
     val threshold: Double,
     val amount: Double,
+    val exchangeMarket: String,
+    var status: String
 ) {
     private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
     private val thresholdManager: ThresholdManager = ThresholdManager()
