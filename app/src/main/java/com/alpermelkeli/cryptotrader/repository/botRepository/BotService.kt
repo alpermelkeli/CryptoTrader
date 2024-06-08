@@ -107,11 +107,7 @@ class BotService : Service() {
     }
     private fun updateBot(id: String, amount:Double, threshold: Double){
         val botManager = botManagers[id]!!
-        botManager.stop()
-        botManager.status = "Active"
-        botManager.amount = amount
-        botManager.threshold = threshold
-        botManager.start()
+        botManager.update(amount,threshold)
         BotManagerStorage.updateBotManager(id,botManager)
     }
     private fun stopBot(id: String) {

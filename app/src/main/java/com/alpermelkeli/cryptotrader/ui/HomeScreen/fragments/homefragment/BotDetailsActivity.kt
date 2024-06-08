@@ -4,15 +4,13 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.alpermelkeli.cryptotrader.databinding.ActivityBotDetailsBinding
-
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
-
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +40,7 @@ class BotDetailsActivity : AppCompatActivity() {
             val amount = botManager.amount
             val threshold = botManager.threshold
             getPairsQuantities(firstPairName,secondPairName)
+            setUpWebView()
             binding.botIdText.text = id
             binding.pairText.text = pairName
             binding.firstPairText.text = firstPairName
@@ -54,6 +53,13 @@ class BotDetailsActivity : AppCompatActivity() {
         binding.updateButton.setOnClickListener {  botManagerID?.let { updateTradingBot(it,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }}
     }
 
+    private fun setUpWebView() {
+        val webview = binding.tradingViewWebView
+        webview.settings.javaScriptEnabled = true
+        webview.webViewClient = WebViewClient()
+        val url = "file:///android_asset/tradingview.html"
+        webview.loadUrl(url)
+    }
     private fun getPairsQuantities(firstPair: String, secondPair: String) {
         val binanceAccountOperations = BinanceAccountOperations()
 
@@ -69,7 +75,6 @@ class BotDetailsActivity : AppCompatActivity() {
             binding.secondPairQuantityText.text = secondQuantity.toString()
         }
     }
-
     private fun stopTradingBot(id: String) {
         val intent = Intent(this, BotService::class.java).apply {
             action = "STOP_BOT"
