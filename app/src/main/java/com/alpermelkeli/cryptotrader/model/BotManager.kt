@@ -65,38 +65,33 @@ class BotManager(
         println("Open position of $pairName = $openPosition")
 
         if (!openPosition && buyThreshold != null && currentPrice > buyThreshold) {
-            try {
-                exchangeOperations.buyCoin(pairName, amount)
-                openPosition = true
-                lastBuyPrice = currentPrice
-                thresholdManager.setSellThreshold(pairName, buyThreshold)
-                thresholdManager.removeBuyThreshold(pairName)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+
+            exchangeOperations.buyCoin(pairName, amount)
+            openPosition = true
+            lastBuyPrice = currentPrice
+            thresholdManager.setSellThreshold(pairName, buyThreshold)
+            thresholdManager.removeBuyThreshold(pairName)
+
+
         }
 
         if (openPosition && sellThreshold != null && currentPrice < sellThreshold) {
-            try {
-                exchangeOperations.sellCoin(pairName, amount)
-                openPosition = false
-                thresholdManager.removeSellThreshold(pairName)
-                thresholdManager.setBuyThreshold(pairName, threshold)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+
+            exchangeOperations.sellCoin(pairName, amount)
+            openPosition = false
+            thresholdManager.removeSellThreshold(pairName)
+            thresholdManager.setBuyThreshold(pairName, threshold)
+
         }
 
 
         if (!openPosition && lastBuyPrice != null && currentPrice > lastBuyPrice!!) {
-            try {
-                exchangeOperations.buyCoin(pairName, amount)
-                openPosition = true
-                lastBuyPrice = currentPrice
-                thresholdManager.setSellThreshold(pairName, lastBuyPrice!!)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+
+            exchangeOperations.buyCoin(pairName, amount)
+            openPosition = true
+            lastBuyPrice = currentPrice
+            thresholdManager.setSellThreshold(pairName, lastBuyPrice!!)
+
         }
     }
 }
