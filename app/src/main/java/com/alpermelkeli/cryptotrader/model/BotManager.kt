@@ -33,22 +33,32 @@ class BotManager(
         webSocketManager!!.connect(pairName)
     }
     fun update(amount: Double,threshold: Double){
-        stop()
+        if(status=="Active"){
+            stop()
+        }
         this.amount = amount
+
         this.threshold = threshold
+
         if(openPosition){
             thresholdManager.setSellThreshold(pairName,threshold)
         }
         else{
             thresholdManager.setBuyThreshold(pairName,threshold)
         }
-        val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
-            override fun onPriceUpdate(price: String) {
-                val currentPrice = price.toDouble()
-                handlePriceUpdate(currentPrice)
+        /**
+         * If there is websocket listener before don't create new.
+         */
+        if (webSocketManager == null) {
+            val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
+                override fun onPriceUpdate(price: String) {
+                    val currentPrice = price.toDouble()
+                    handlePriceUpdate(currentPrice)
+                }
             }
+            webSocketManager = BinanceWebSocketManager(listener)
         }
-        webSocketManager = BinanceWebSocketManager(listener)
+
         webSocketManager!!.connect(pairName)
     }
     fun stop() {
@@ -58,7 +68,7 @@ class BotManager(
     private fun handlePriceUpdate(currentPrice: Double) {
         val buyThreshold = thresholdManager.getBuyThreshold(pairName)
         val sellThreshold = thresholdManager.getSellThreshold(pairName)
-
+        println("AAAAAA")
         println("Current price of $pairName = $currentPrice")
         println("Buy threshold of $pairName = $buyThreshold")
         println("Sell threshold of $pairName = $sellThreshold")

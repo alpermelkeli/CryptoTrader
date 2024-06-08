@@ -15,6 +15,10 @@ import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
 import com.alpermelkeli.cryptotrader.ui.MainActivity
 
+/**
+ * This class provides foreground service for the android app. It is manage bots by fetching data with using
+ * BotManagerStorage(RAM) that has BotManager objects that has management features inside.
+ */
 class BotService : Service() {
     private val botManagers =  BotManagerStorage.getBotManagers()
 
@@ -104,11 +108,14 @@ class BotService : Service() {
         botManager.start()
         botManager.status ="Active"
         BotManagerStorage.updateBotManager(id,botManager)
+        Toast.makeText(applicationContext,"Bot başlatıldı",Toast.LENGTH_LONG).show()
     }
     private fun updateBot(id: String, amount:Double, threshold: Double){
         val botManager = botManagers[id]!!
         botManager.update(amount,threshold)
+        botManager.status = "Active"
         BotManagerStorage.updateBotManager(id,botManager)
+        Toast.makeText(applicationContext,"Bot güncellendi",Toast.LENGTH_LONG).show()
     }
     private fun stopBot(id: String) {
         val botManager = botManagers[id]!!
