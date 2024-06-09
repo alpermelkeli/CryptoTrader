@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alpermelkeli.cryptotrader.R
 
 class TradeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
     val tradeTime: TextView = view.findViewById(R.id.trade_time)
     val tradePrice: TextView = view.findViewById(R.id.trade_price)
     val tradeAmount: TextView = view.findViewById(R.id.trade_amount)
+
 }

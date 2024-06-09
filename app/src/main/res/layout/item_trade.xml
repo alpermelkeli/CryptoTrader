@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="30dp"
     android:orientation="horizontal"
     android:gravity="center"
     android:padding="8dp">
 
     <TextView
         android:id="@+id/trade_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="30dp"
         android:text="Time"
+        android:textAlignment="center"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:padding="4dp" />
 
     <TextView
         android:id="@+id/trade_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="30dp"
         android:text="Price"
+        android:textAlignment="center"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:padding="4dp" />
 
     <TextView
         android:id="@+id/trade_amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="30dp"
+        android:textColor="@color/white"
         android:text="Amount"
+        android:textAlignment="center"
         android:textSize="16sp"
         android:padding="4dp" />
 </LinearLayout>

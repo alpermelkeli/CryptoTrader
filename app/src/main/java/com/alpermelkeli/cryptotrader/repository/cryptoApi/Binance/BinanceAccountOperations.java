@@ -13,13 +13,16 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
 
 public class BinanceAccountOperations implements AccountOperations {
     private static final String API_URL = "https://testnet.binance.vision/api/v3/account";
-    private static final String BASE_URL = "https://testnet.binance.vision/api/v3/";
-
     private static final String API_KEY = "8lYWU5jk23jNIjTcEc9J9OLEuuyGJJ3xHqPRcBWggxPhi0IiTCaImqYDV07eqgzZ";
     private static final String API_SECRET = "iTMSOfhtH0sArKkT16Iq5u1PCQFh0OLM56kSSary7AocnGt5rRhSN4yVszs7j439";
 
@@ -125,86 +128,66 @@ public class BinanceAccountOperations implements AccountOperations {
         }
         return 0.0;
     }
-
     @Override
-    public List<Trade> getTradeHistorySelectedCoin(String pairName) {
-        List<Trade> tradeHistory = new ArrayList<>();
-        return tradeHistory;
-        /*System.out.println(pairName);
-        List<Trade> tradeHistory = new ArrayList<>();
-        try {
-            long timeOffset = calculateTimeOffset();
-            System.out.println(timeOffset);
-            long timestamp = System.currentTimeMillis() + timeOffset;
-            String queryString = "symbol=" + pairName + "&timestamp=" + timestamp;
-            String signature = generateSignature(queryString);
+    public CompletableFuture<List<Trade>> getTradeHistorySelectedCoin(String pairName) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Trade> tradeHistory = new ArrayList<>();
+            try {
+                long timestamp = System.currentTimeMillis();
+                String queryString = "symbol=" + pairName + "&timestamp=" + timestamp;
+                String signature = generateSignature(queryString);
+                queryString += "&signature=" + encode(signature);
 
-            queryString += "&signature=" + URLEncoder.encode(signature, StandardCharsets.UTF_8.toString());
-            HttpUrl httpUrl = HttpUrl.parse(BASE_URL + "myTrades").newBuilder().encodedQuery(queryString).build();
+                HttpUrl httpUrl = HttpUrl.parse("https://testnet.binance.vision/api/v3/myTrades")
+                        .newBuilder()
+                        .encodedQuery(queryString)
+                        .build();
 
-            System.out.println("Request URL: " + httpUrl.toString());
+                Request request = new Request.Builder()
+                        .url(httpUrl)
+                        .addHeader("X-MBX-APIKEY", API_KEY)
+                        .build();
 
-            Request request = new Request.Builder()
-                    .url(httpUrl)
-                    .addHeader("X-MBX-APIKEY", API_KEY)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    System.out.println("Response code: " + response.code());
-                    System.out.println("Response message: " + response.message());
-                    if (response.body() != null) {
-                        System.out.println("Response body: " + response.body().string());
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        System.out.println("Request failed: " + response);
+                        throw new IOException("Unexpected code " + response);
                     }
-                    throw new IOException("Unexpected code " + response);
+
+                    String responseBody = response.body().string();
+                    System.out.println("Response body: " + responseBody);
+
+                    JSONArray json = new JSONArray(responseBody);
+
+                    for (int i = 0; i < json.length(); i++) {
+                        JSONObject tradeJson = json.getJSONObject(i);
+                        long timeMillis = tradeJson.getLong("time");
+                        double price = tradeJson.getDouble("price");
+                        double amount = tradeJson.getDouble("qty");
+                        boolean isBuyer = tradeJson.getBoolean("isBuyer");
+                        boolean isBestMatch = tradeJson.getBoolean("isBestMatch");
+                        String time = convertMillisToDate(timeMillis);
+                        if(isBestMatch){
+                            Trade trade = new Trade(time, price, amount,isBuyer);
+                            tradeHistory.add(trade);
+                        }
+
+                    }
                 }
-
-                String responseBody = response.body().string();
-                System.out.println("Response Body: " + responseBody);
-
-                JSONArray json = new JSONArray(responseBody);
-
-                for (int i = 0; i < json.length(); i++) {
-                    JSONObject tradeJson = json.getJSONObject(i);
-                    Trade trade = new Trade(tradeJson.getLong("time"), tradeJson.getDouble("price"), tradeJson.getDouble("qty"), tradeJson.getBoolean("isBuyer"));
-
-                    tradeHistory.add(trade);
-                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return tradeHistory;
-    }
-    private long getServerTime() throws IOException {
-        Request request = new Request.Builder()
-                .url("https://testnet.binance.vision/api/v3/time")
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            System.out.println("HERE");
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-
-            String responseBody = response.body().string();
-            JSONObject json = new JSONObject(responseBody);
-            return json.getLong("serverTime");
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+            Collections.reverse(tradeHistory);
+            return tradeHistory;
+        });
     }
 
-    private long calculateTimeOffset() throws IOException {
-        long serverTime = getServerTime();
-        long localTime = System.currentTimeMillis();
-        return serverTime - localTime;
-    }
-*/
+    private String convertMillisToDate(long millis) {
+        Date date = new Date(millis);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(date);
     }
 }
 
