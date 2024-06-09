@@ -218,6 +218,10 @@
                     app:layout_constraintStart_toStartOf="@+id/textView8"
                     app:layout_constraintTop_toBottomOf="@+id/textView8" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tradeHistoryRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
 
             <!-- Action Buttons -->
             <LinearLayout

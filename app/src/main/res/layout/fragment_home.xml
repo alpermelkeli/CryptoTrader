@@ -15,10 +15,10 @@
 
 
         <LinearLayout
+            android:id="@+id/linear"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/manuelBotsRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,13 +93,15 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/manuelBotsRecyclerView"
-            android:layout_width="400dp"
-            android:layout_height="286dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.613" />
+            app:layout_constraintTop_toBottomOf="@id/linear"
+            android:layout_marginTop="35dp"
+             />
 
         <ImageButton
             android:id="@+id/threeTickButton"

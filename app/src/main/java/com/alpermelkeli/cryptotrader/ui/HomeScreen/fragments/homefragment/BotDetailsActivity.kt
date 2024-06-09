@@ -7,17 +7,23 @@ import android.view.WindowManager
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.databinding.ActivityBotDetailsBinding
+import com.alpermelkeli.cryptotrader.model.Trade
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
+import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter.TradingBotsAdapter
+import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment.adapter.TradesAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BotDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBotDetailsBinding
-
+    private val binanceAccountOperations = BinanceAccountOperations()
+    private lateinit var tradeList: MutableList<Trade>
+    private lateinit var adapter: TradesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -30,7 +36,23 @@ class BotDetailsActivity : AppCompatActivity() {
 
         val botManagerID = intent.getStringExtra("id")
 
-        val botManager = botManagerID?.let { BotManagerStorage.getBotManager(it) }
+        setUpView(botManagerID!!)
+
+        binding.backButton.setOnClickListener { finish() }
+
+        binding.passiveButton.setOnClickListener { botManagerID?.let { stopTradingBot(it) } }
+
+        binding.updateButton.setOnClickListener {  botManagerID?.let { updateTradingBot(it,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }}
+    }
+    private fun setUpTradeHistoryRecycler(pairName:String){
+
+        tradeList = binanceAccountOperations.getTradeHistorySelectedCoin(pairName.uppercase())
+        adapter = TradesAdapter(tradeList)
+        binding.tradeHistoryRecyclerView.adapter = adapter
+        binding.tradeHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
+    }
+    private fun setUpView(botManagerID:String){
+        val botManager = botManagerID.let { BotManagerStorage.getBotManager(it) }
 
         botManager?.let {
             val id = botManager.id
@@ -41,6 +63,7 @@ class BotDetailsActivity : AppCompatActivity() {
             val threshold = botManager.threshold
             getPairsQuantities(firstPairName,secondPairName)
             setUpWebView()
+            setUpTradeHistoryRecycler(pairName)
             binding.botIdText.text = id
             binding.pairText.text = pairName
             binding.firstPairText.text = firstPairName
@@ -48,11 +71,7 @@ class BotDetailsActivity : AppCompatActivity() {
             binding.amountEditText.setText(amount.toString())
             binding.thresholdEditText.setText(threshold.toString())
         }
-
-        binding.passiveButton.setOnClickListener { botManagerID?.let { stopTradingBot(it) } }
-        binding.updateButton.setOnClickListener {  botManagerID?.let { updateTradingBot(it,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }}
     }
-
     private fun setUpWebView() {
         val webview = binding.tradingViewWebView
         webview.settings.javaScriptEnabled = true
@@ -61,7 +80,6 @@ class BotDetailsActivity : AppCompatActivity() {
         webview.loadUrl(url)
     }
     private fun getPairsQuantities(firstPair: String, secondPair: String) {
-        val binanceAccountOperations = BinanceAccountOperations()
 
         lifecycleScope.launch {
             val firstQuantity = withContext(Dispatchers.IO) {

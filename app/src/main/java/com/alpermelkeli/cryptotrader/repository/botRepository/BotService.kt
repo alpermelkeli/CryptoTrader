@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
+import com.alpermelkeli.cryptotrader.ui.HomeScreen.HomeScreen
 import com.alpermelkeli.cryptotrader.ui.MainActivity
 
 /**
@@ -84,21 +85,21 @@ class BotService : Service() {
         // Append each active bots information to the StringBuilder
 
         for ((id, botManager) in botManagers) {
-            if(botManager.status.equals("Active")){
-                activeBotInfo.append(botManager.pairName).append(" Thresold: ${botManager.threshold}\n")
+            if(botManager.status=="Active"){
+            activeBotInfo.append(botManager.pairName+">"+botManager.threshold+"\n")
             }
         }
 
-        // Create an intent to launch the MainActivity when notification is clicked
-        val notificationIntent = Intent(this, MainActivity::class.java)
+        // Create an intent to launch the HomeScreen when notification is clicked
+        val notificationIntent = Intent(this, HomeScreen::class.java)
 
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         // Build the notification with active bot information
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Bot Service")
-            .setContentText("The bot running.\nActive Bots:\n$activeBotInfo")
-            .setSmallIcon(R.drawable.btc_vector)
+            .setContentTitle("CryptoTrader")
+            .setContentText("Active Bots:$activeBotInfo")
+            .setSmallIcon(R.drawable.market_icon)
             .setContentIntent(pendingIntent)
             .build()
     }
