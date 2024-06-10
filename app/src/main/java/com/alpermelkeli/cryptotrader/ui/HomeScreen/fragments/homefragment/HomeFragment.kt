@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startForegroundService
 import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 
@@ -65,11 +66,33 @@ class HomeFragment : Fragment() {
             tradingBots.add(TradingBot(id,R.drawable.btc_vector,botManager.exchangeMarket,botManager.status,botManager.firstPairName,botManager.secondPairName,botManager.pairName))
         }
 
-        adapter = TradingBotsAdapter(tradingBots) { tradingBot ->
-            openBotDetailsActivity(tradingBot)
-        }
+        adapter = TradingBotsAdapter(tradingBots,
+            clickListener = { tradingBot -> openBotDetailsActivity(tradingBot)},
+            longClickListener = {tradingBot -> showRemoveDialog(tradingBot) })
+
         binding.manuelBotsRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.manuelBotsRecyclerView.adapter = adapter
+    }
+    private fun showRemoveDialog(tradingBot: TradingBot) {
+        val dialog = AlertDialog.Builder(context)
+            .setTitle("Botu Sil")
+            .setMessage("${tradingBot.pairName} botunu silmek istediğinizden emin misiniz?")
+            .setPositiveButton("Evet") { _, _ ->
+                removeTradingBot(tradingBot)
+            }
+            .setNegativeButton("Hayır", null)
+            .create()
+        dialog.show()
+    }
+    private fun removeTradingBot(tradingBot: TradingBot) {
+        // Remove the bot from the list and notify the adapter
+        val position = tradingBots.indexOf(tradingBot)
+        if (position != -1) {
+            tradingBots.removeAt(position)
+            adapter.notifyItemRemoved(position)
+            // Remove the bot from the storage
+            BotManagerStorage.removeBotManager(tradingBot.id)
+        }
     }
 
     private fun setupButtonListeners() {

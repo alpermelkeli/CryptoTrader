@@ -61,6 +61,8 @@ object BotManagerStorage {
 
     }
     fun removeBotManager(id: String) {
+        var bot = botManagers[id]
+        bot?.stop()
         botManagers.remove(id)
         dbHelper.removeBotById(id)
     }

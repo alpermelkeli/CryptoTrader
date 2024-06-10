@@ -9,15 +9,18 @@ import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment.adapte
 
 class TradingBotsAdapter(
     private val tradingBots: List<TradingBot>,
-    private val clickListener: (TradingBot) -> Unit
+    private val clickListener: (TradingBot) -> Unit,
+    private val longClickListener:(TradingBot) ->Unit
 ) : RecyclerView.Adapter<TradingBotViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradingBotViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.trading_bots_item, parent, false)
-        return TradingBotViewHolder(view) { position ->
-            clickListener(tradingBots[position])
+        return TradingBotViewHolder(view,
+            clickListener = {position -> clickListener(tradingBots[position])},
+            longClickListener = {position->longClickListener(tradingBots[position])}
+            )
         }
-    }
+
 
     override fun onBindViewHolder(holder: TradingBotViewHolder, position: Int) {
         val bot = tradingBots[position]

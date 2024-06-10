@@ -6,7 +6,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.alpermelkeli.cryptotrader.R
 
-class TradingBotViewHolder(itemView: View, private val clickListener: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class TradingBotViewHolder(itemView: View,
+                           private val clickListener: (Int) -> Unit,
+                           private val longClickListener: (Int) ->Unit)
+    : RecyclerView.ViewHolder(itemView) {
     val coinPairName: TextView = itemView.findViewById(R.id.nameText)
     val coinImage: ImageView = itemView.findViewById(R.id.coinImage)
     val exchangeMarketText: TextView = itemView.findViewById(R.id.exchangeMarketText)
@@ -16,5 +19,10 @@ class TradingBotViewHolder(itemView: View, private val clickListener: (Int) -> U
         itemView.setOnClickListener {
             clickListener(adapterPosition)
         }
+        itemView.setOnLongClickListener{
+            longClickListener(adapterPosition)
+            true
+        }
+
     }
 }

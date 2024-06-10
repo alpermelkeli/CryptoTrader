@@ -66,8 +66,8 @@ class ApiSettingsFragment : Fragment() {
 
     private fun setUpRecyclerView() {
         apiList.addAll(ApiStorage.getAllApiItems())
-        apiAdapter = ApiAdapter(apiList, deleteClickListener ={apiEntity -> deleteSelectedApi(apiEntity)}
-        ,
+        apiAdapter = ApiAdapter(apiList,
+            deleteClickListener ={apiEntity -> deleteSelectedApi(apiEntity)},
             selectClickListener = {apiEntity -> selectApi(apiEntity) }
         )
         binding.apiRecyclerView.layoutManager = LinearLayoutManager(context)

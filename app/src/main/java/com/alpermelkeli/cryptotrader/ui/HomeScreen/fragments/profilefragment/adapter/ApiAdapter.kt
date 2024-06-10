@@ -11,7 +11,6 @@ class ApiAdapter(private val apiList: MutableList<ApiEntity>,
     private val selectClickListener:(ApiEntity)->Unit
 ) :
     RecyclerView.Adapter<ApiViewHolder>() {
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApiViewHolder {
         val binding = ItemApiBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ApiViewHolder(binding,
@@ -23,13 +22,10 @@ class ApiAdapter(private val apiList: MutableList<ApiEntity>,
             }
         )
     }
-
-
     override fun onBindViewHolder(holder: ApiViewHolder, position: Int) {
         val api = apiList[position]
         holder.bind(api)
     }
-
     override fun getItemCount(): Int = apiList.size
 
 }
