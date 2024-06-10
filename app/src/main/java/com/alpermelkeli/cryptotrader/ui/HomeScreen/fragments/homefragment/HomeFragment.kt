@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Toast
+import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 
 class HomeFragment : Fragment() {
@@ -39,6 +41,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         binanceAccountOperations = BinanceAccountOperations()
         binding = FragmentHomeBinding.inflate(layoutInflater)
         BotManagerStorage.initialize(requireContext())

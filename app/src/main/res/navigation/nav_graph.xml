@@ -27,5 +27,17 @@
         android:id="@+id/profileFragment"
         android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.profilefragment.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_apiSettingsFragment"
+            app:destination="@id/apiSettingsFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/apiSettingsFragment"
+        android:name="com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.profilefragment.ApiSettingsFragment"
+        android:label="API Settings"
+        tools:layout="@layout/fragment_api_settings" />
 </navigation>

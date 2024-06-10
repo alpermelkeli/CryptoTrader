@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.HomeScreen.fragments.homefragment.HomeFragment"
-    android:background="#1C1718"
+    android:background="@color/fragment_background_color"
     >
 
 

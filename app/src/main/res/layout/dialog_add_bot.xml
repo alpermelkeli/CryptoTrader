@@ -8,6 +8,7 @@
     <EditText
         android:id="@+id/firstPairEditText"
         android:layout_width="match_parent"
+        android:backgroundTint="#00FFFFFF"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text"
@@ -16,6 +17,8 @@
     <EditText
         android:id="@+id/secondPairEditText"
         android:layout_width="match_parent"
+        android:backgroundTint="#00FFFFFF"
+
         android:layout_height="wrap_content"
         android:hint="2.Coin Adı" />
 
@@ -23,6 +26,7 @@
         android:id="@+id/thresholdEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#00FFFFFF"
         android:hint="Eşik Değeri"
         android:inputType="numberDecimal" />
 
@@ -30,6 +34,7 @@
         android:id="@+id/amountEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#00FFFFFF"
         android:hint="İşlem Miktarı"
         android:inputType="numberDecimal" />
 

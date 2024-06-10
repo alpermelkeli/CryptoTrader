@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +15,6 @@ import com.alpermelkeli.cryptotrader.model.Trade
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
-import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter.TradingBotsAdapter
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment.adapter.TradesAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,8 @@ class BotDetailsActivity : AppCompatActivity() {
 
         val botManagerID = intent.getStringExtra("id")
 
+        setUpWebView()
+
         setUpView(botManagerID!!)
 
         binding.backButton.setOnClickListener { finish() }
@@ -61,7 +64,6 @@ class BotDetailsActivity : AppCompatActivity() {
             val amount = botManager.amount
             val threshold = botManager.threshold
             getPairsQuantities(firstPairName,secondPairName)
-            setUpWebView()
             setUpTradeHistoryRecycler(pairName)
             binding.botIdText.text = id
             binding.pairText.text = pairName

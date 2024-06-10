@@ -155,7 +155,6 @@ public class BinanceAccountOperations implements AccountOperations {
                     }
 
                     String responseBody = response.body().string();
-                    System.out.println("Response body: " + responseBody);
 
                     JSONArray json = new JSONArray(responseBody);
 

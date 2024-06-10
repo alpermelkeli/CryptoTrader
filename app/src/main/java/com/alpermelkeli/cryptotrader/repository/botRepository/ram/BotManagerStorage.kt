@@ -64,7 +64,6 @@ object BotManagerStorage {
         botManagers.remove(id)
         dbHelper.removeBotById(id)
     }
-
     private fun loadBotsFromDatabase() {
         val bots = dbHelper.getAllBots()
         for (bot in bots) {
