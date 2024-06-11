@@ -21,11 +21,32 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
-public class BinanceAccountOperations implements AccountOperations {
+public class BinanceAccountOperations implements AccountOperations{
     private static final String API_URL = "https://testnet.binance.vision/api/v3/account";
-    private static final String API_KEY = "8lYWU5jk23jNIjTcEc9J9OLEuuyGJJ3xHqPRcBWggxPhi0IiTCaImqYDV07eqgzZ";
-    private static final String API_SECRET = "iTMSOfhtH0sArKkT16Iq5u1PCQFh0OLM56kSSary7AocnGt5rRhSN4yVszs7j439";
+    private static final String BASE_URL = "https://testnet.binance.vision/api";
 
+    private String API_KEY;
+    private String API_SECRET;
+    public BinanceAccountOperations(String apiKey, String apiSecret) {
+        this.API_KEY = apiKey;
+        this.API_SECRET = apiSecret;
+    }
+
+    public String getAPI_KEY() {
+        return API_KEY;
+    }
+
+    public void setAPI_KEY(String API_KEY) {
+        this.API_KEY = API_KEY;
+    }
+
+    public String getAPI_SECRET() {
+        return API_SECRET;
+    }
+
+    public void setAPI_SECRET(String API_SECRET) {
+        this.API_SECRET = API_SECRET;
+    }
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -181,6 +202,83 @@ public class BinanceAccountOperations implements AccountOperations {
             Collections.reverse(tradeHistory);
             return tradeHistory;
         });
+    }
+    @Override
+    public void buyCoin(String symbol, double quantity) {
+        try {
+            String endpoint = "/v3/order";
+            String url = BASE_URL + endpoint;
+
+            long timestamp = System.currentTimeMillis();
+            String queryString = "symbol=" + encode(symbol) + "&side=BUY&type=MARKET&quantity=" + quantity + "&timestamp=" + timestamp;
+            String signature = generateSignature(queryString);
+            queryString += "&signature=" + encode(signature);
+
+            HttpUrl httpUrl = HttpUrl.parse(url).newBuilder().encodedQuery(queryString).build();
+
+            Request request = new Request.Builder()
+                    .url(httpUrl)
+                    .addHeader("X-MBX-APIKEY", API_KEY)
+                    .post(RequestBody.create(null, new byte[0]))
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        System.out.println("Buy order placed successfully");
+                    } else {
+                        System.out.println("Failed to place buy order: " + response.code() + " | " + response.message() + " | " + response.body().string());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sellCoin(String symbol, double quantity) {
+        try {
+            String endpoint = "/v3/order";
+            String url = BASE_URL + endpoint;
+
+            long timestamp = System.currentTimeMillis();
+            String queryString = "symbol=" + encode(symbol) + "&side=SELL&type=MARKET&quantity=" + quantity + "&timestamp=" + timestamp;
+            String signature = generateSignature(queryString);
+            queryString += "&signature=" + encode(signature);
+
+            HttpUrl httpUrl = HttpUrl.parse(url).newBuilder().encodedQuery(queryString).build();
+
+            Request request = new Request.Builder()
+                    .url(httpUrl)
+                    .addHeader("X-MBX-APIKEY", API_KEY)
+                    .post(RequestBody.create(null, new byte[0]))
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        System.out.println("Sell order placed successfully");
+                    } else {
+                        System.out.println("Failed to place sell order: " + response.message() + " | " + response.body().string());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String convertMillisToDate(long millis) {

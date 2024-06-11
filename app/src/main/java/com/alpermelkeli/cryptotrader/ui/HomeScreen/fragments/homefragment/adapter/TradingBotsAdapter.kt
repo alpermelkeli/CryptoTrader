@@ -25,11 +25,10 @@ class TradingBotsAdapter(
 
     override fun onBindViewHolder(holder: TradingBotViewHolder, position: Int) {
         val bot = tradingBots[position]
-
         holder.coinPairName.text = bot.pairName
         holder.coinImage.setImageResource(R.drawable.btc_vector)
         holder.exchangeMarketText.text = bot.exchangeMarket
-        if(bot.status=="Passive") holder.activeText.setTextColor(Color.RED)
+        if(bot.status=="Passive") holder.activeText.setTextColor(Color.RED) else holder.activeText.setTextColor(Color.GREEN)
         holder.activeText.text = bot.status
     }
 

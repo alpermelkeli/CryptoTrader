@@ -1,9 +1,9 @@
 package com.alpermelkeli.cryptotrader.model
 
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceExchangeOperations
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
 import com.alpermelkeli.cryptotrader.repository.botRepository.ThresholdManager
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
 
 class BotManager(
     val id: String,
@@ -13,31 +13,30 @@ class BotManager(
     var threshold: Double,
     var amount: Double,
     val exchangeMarket: String,
-    var status: String
+    var status: String,
+    val apiKey: String,
+    val secretKey: String
 ) {
-    private val exchangeOperations: BinanceExchangeOperations = BinanceExchangeOperations()
+    private val binanceAccountOperations = BinanceAccountOperations(apiKey,secretKey)
     private val thresholdManager: ThresholdManager = ThresholdManager()
     private var openPosition: Boolean = false
     private var webSocketManager: BinanceWebSocketManager? = null
 
     fun start() {
         thresholdManager.setBuyThreshold(pairName, threshold)
-        if (webSocketManager == null) {
-            val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
-                override fun onPriceUpdate(price: String) {
-                    val currentPrice = price.toDouble()
-                    handlePriceUpdate(currentPrice)
-                }
+
+        val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
+            override fun onPriceUpdate(price: String) {
+                val currentPrice = price.toDouble()
+                handlePriceUpdate(currentPrice)
             }
-            webSocketManager = BinanceWebSocketManager(listener)
         }
+        webSocketManager = BinanceWebSocketManager(listener)
         webSocketManager!!.connect(pairName)
     }
 
     fun update(amount: Double, threshold: Double) {
-        if (status == "Active") {
-            stop()
-        }
+        stop()
         this.amount = amount
         this.threshold = threshold
 
@@ -47,25 +46,23 @@ class BotManager(
             thresholdManager.setBuyThreshold(pairName, threshold)
         }
 
-
-            val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
-                override fun onPriceUpdate(price: String) {
-                    val currentPrice = price.toDouble()
-                    handlePriceUpdate(currentPrice)
-                }
+        val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
+            override fun onPriceUpdate(price: String) {
+                val currentPrice = price.toDouble()
+                handlePriceUpdate(currentPrice)
             }
-            webSocketManager = BinanceWebSocketManager(listener)
-
+        }
+        webSocketManager = BinanceWebSocketManager(listener)
         webSocketManager!!.connect(pairName)
     }
 
     fun stop() {
         webSocketManager?.disconnect()
+        webSocketManager = null
     }
 
     private fun handlePriceUpdate(currentPrice: Double) {
         val buyThreshold = thresholdManager.getBuyThreshold(pairName)
-
         val sellThreshold = thresholdManager.getSellThreshold(pairName)
 
         println("Current price of $pairName = $currentPrice")
@@ -74,14 +71,14 @@ class BotManager(
         println("Open position of $pairName = $openPosition")
 
         if (!openPosition && buyThreshold != null && currentPrice > buyThreshold) {
-            exchangeOperations.buyCoin(pairName, amount)
+            binanceAccountOperations.buyCoin(pairName, amount)
             openPosition = true
             thresholdManager.setSellThreshold(pairName, buyThreshold)
             thresholdManager.removeBuyThreshold(pairName)
         }
 
         if (openPosition && sellThreshold != null && currentPrice < sellThreshold) {
-            exchangeOperations.sellCoin(pairName, amount)
+            binanceAccountOperations.sellCoin(pairName, amount)
             openPosition = false
             thresholdManager.removeSellThreshold(pairName)
             thresholdManager.setBuyThreshold(pairName, threshold)

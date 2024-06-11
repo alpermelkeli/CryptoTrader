@@ -22,7 +22,6 @@ import kotlinx.coroutines.*
  */
 class BotService : Service() {
     private val botManagers = BotManagerStorage.getBotManagers()
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
@@ -51,11 +50,6 @@ class BotService : Service() {
         return START_STICKY
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
-        Log.d("BotService", "Service destroyed")
-    }
 
     override fun onBind(intent: Intent): IBinder? = null
 
@@ -95,44 +89,32 @@ class BotService : Service() {
 
     private fun startBot(id: String) {
         val botManager = botManagers[id]!!
-        serviceScope.launch {
-            botManager.start()
-            botManager.status = "Active"
-            BotManagerStorage.updateBotManager(id, botManager)
-            withContext(Dispatchers.Main) {
-                Toast.makeText(applicationContext, "Bot started", Toast.LENGTH_LONG).show()
-            }
+        botManager.start()
+        botManager.status = "Active"
+        BotManagerStorage.updateBotManager(id, botManager)
+        Toast.makeText(applicationContext, "Bot started", Toast.LENGTH_LONG).show()
             Log.d("BotService", "Bot $id started")
-        }
     }
 
+
     private fun updateBot(id: String, amount: Double, threshold: Double) {
+        println(botManagers.toString())
         val botManager = botManagers[id]!!
-        serviceScope.launch {
-            botManager.update(amount, threshold)
-            botManager.status = "Active"
-            BotManagerStorage.updateBotManager(id, botManager)
-            withContext(Dispatchers.Main) {
-                Toast.makeText(applicationContext, "Bot updated", Toast.LENGTH_LONG).show()
-            }
-            Log.d("BotService", "Bot $id updated")
-        }
+        botManager.update(amount, threshold)
+        botManager.status = "Active"
+        BotManagerStorage.updateBotManager(id, botManager)
+        Toast.makeText(application, "Bot updated", Toast.LENGTH_LONG).show()
+        Log.d("BotService", "Bot $id updated")
     }
+
 
     private fun stopBot(id: String) {
         val botManager = botManagers[id]!!
-        serviceScope.launch {
-            botManager.stop()
-            botManager.status = "Passive"
-            BotManagerStorage.updateBotManager(id, botManager)
-            withContext(Dispatchers.Main) {
-                Toast.makeText(applicationContext, "Bot stopped", Toast.LENGTH_LONG).show()
-            }
-            Log.d("BotService", "Bot $id stopped")
-
-            stopForeground(true)
-            stopSelf()
-        }
+        botManager.stop()
+        botManager.status = "Passive"
+        BotManagerStorage.updateBotManager(id, botManager)
+        Toast.makeText(applicationContext, "Bot stopped", Toast.LENGTH_LONG).show()
+        Log.d("BotService", "Bot $id stopped")
     }
 
     companion object {

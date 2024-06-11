@@ -26,7 +26,9 @@ object BotManagerStorage {
                 botManager.threshold,
                 botManager.amount,
                 botManager.exchangeMarket,
-                botManager.status
+                botManager.status,
+                botManager.apiKey,
+                botManager.secretKey
             )
         )
     }
@@ -38,14 +40,11 @@ object BotManagerStorage {
     fun getBotManagers(): MutableMap<String, BotManager> {
         return botManagers
     }
-    fun updateBotManager(id:String, botManager: BotManager){
 
+    fun updateBotManager(id: String, botManager: BotManager) {
         botManagers.remove(id)
-
         dbHelper.removeBotById(id)
-
         botManagers[id] = botManager
-
         dbHelper.insertBot(
             BotEntity(
                 botManager.id,
@@ -55,17 +54,20 @@ object BotManagerStorage {
                 botManager.threshold,
                 botManager.amount,
                 botManager.exchangeMarket,
-                botManager.status
+                botManager.status,
+                botManager.apiKey,
+                botManager.secretKey
             )
         )
-
     }
+
     fun removeBotManager(id: String) {
-        var bot = botManagers[id]
+        val bot = botManagers[id]
         bot?.stop()
         botManagers.remove(id)
         dbHelper.removeBotById(id)
     }
+
     private fun loadBotsFromDatabase() {
         val bots = dbHelper.getAllBots()
         for (bot in bots) {
@@ -77,9 +79,13 @@ object BotManagerStorage {
                 bot.threshold,
                 bot.amount,
                 bot.exchangeMarket,
-                bot.status
+                bot.status,
+                bot.apiKey,
+                bot.secretKey
             )
             botManagers[bot.id] = botManager
         }
     }
+
+
 }

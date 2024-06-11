@@ -39,32 +39,28 @@ class HomeFragment : Fragment() {
     private lateinit var binanceAccountOperations: BinanceAccountOperations
     private val REQUEST_FOREGROUND_PERMISSION = 1
     private val REQUEST_DATA_SYNC_PERMISSION = 2
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        binanceAccountOperations = BinanceAccountOperations()
         binding = FragmentHomeBinding.inflate(layoutInflater)
-        BotManagerStorage.initialize(requireContext())
-        setupRecyclerView()
-        setupButtonListeners()
-        updateAccountBalance()
+        initializeAccountOperations()
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        setupRecyclerView()
+        if (::binanceAccountOperations.isInitialized) {
+            setupRecyclerView()
+        }
     }
+
     private fun setupRecyclerView() {
-        /**
-         * Firstly get data from database and insert it.
-         */
         tradingBots = mutableListOf()
 
         for((id,botManager) in BotManagerStorage.getBotManagers()){
-            tradingBots.add(TradingBot(id,R.drawable.btc_vector,botManager.exchangeMarket,botManager.status,botManager.firstPairName,botManager.secondPairName,botManager.pairName))
+            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName))
         }
 
         adapter = TradingBotsAdapter(tradingBots,
@@ -74,6 +70,7 @@ class HomeFragment : Fragment() {
         binding.manuelBotsRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.manuelBotsRecyclerView.adapter = adapter
     }
+
     private fun showRemoveDialog(tradingBot: TradingBot) {
         val dialog = AlertDialog.Builder(context)
             .setTitle("Botu Sil")
@@ -85,13 +82,12 @@ class HomeFragment : Fragment() {
             .create()
         dialog.show()
     }
+
     private fun removeTradingBot(tradingBot: TradingBot) {
-        // Remove the bot from the list and notify the adapter
         val position = tradingBots.indexOf(tradingBot)
         if (position != -1) {
             tradingBots.removeAt(position)
             adapter.notifyItemRemoved(position)
-            // Remove the bot from the storage
             BotManagerStorage.removeBotManager(tradingBot.id)
         }
     }
@@ -122,13 +118,13 @@ class HomeFragment : Fragment() {
 
                 if (pairName.isNotEmpty() && threshold != null && amount != null) {
                     val id = generateBotId()
-                    val newBot = TradingBot(id,R.drawable.btc_vector, "BINANCE", "Aktif", firstPairName,secondPairName,pairName)
+                    val newBot = TradingBot(id, R.drawable.btc_vector, "BINANCE", "Active", firstPairName, secondPairName, pairName)
 
                     tradingBots.add(newBot)
 
                     adapter.notifyItemInserted(tradingBots.size - 1)
 
-                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount,"BINANCE","Active")
+                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Active",binanceAccountOperations.apI_KEY,binanceAccountOperations.apI_SECRET)
 
                     BotManagerStorage.addBotManager(botManager)
 
@@ -140,9 +136,11 @@ class HomeFragment : Fragment() {
 
         dialog.show()
     }
+
     private fun generateBotId(): String {
         return "BOT_" + System.currentTimeMillis().toString()
     }
+
     private fun checkAndRequestForegroundServicePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (context?.checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
@@ -159,9 +157,7 @@ class HomeFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (context?.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_DATA_SYNC_PERMISSION)
-            } else {
             }
-        } else {
         }
     }
 
@@ -191,16 +187,17 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    private fun startTradingBot(id:String) {
+
+    private fun startTradingBot(id: String) {
         val intent = Intent(context, BotService::class.java).apply {
             action = "START_BOT"
             putExtra("id", id)
-
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(intent)
         }
     }
+
     private fun updateAccountBalance() {
         CoroutineScope(Dispatchers.IO).launch {
             val balance = binanceAccountOperations.accountBalance
@@ -209,30 +206,36 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     private fun openBotDetailsActivity(tradingBot: TradingBot) {
-        val intent = Intent(context, BotDetailsActivity::class.java)
-        intent.putExtra("id", tradingBot.id)
-        intent.putExtra("firstPairName",tradingBot.firstPairName)
-        intent.putExtra("secondPairName",tradingBot.secondPairName)
+        val intent = Intent(context, BotDetailsActivity::class.java).apply {
+            putExtra("id", tradingBot.id)
+            putExtra("API_KEY", binanceAccountOperations.apI_KEY)
+            putExtra("SECRET_KEY", binanceAccountOperations.apI_SECRET)
+            putExtra("firstPairName", tradingBot.firstPairName)
+            putExtra("secondPairName", tradingBot.secondPairName)
+        }
         startActivity(intent)
     }
 
     private fun initializeAccountOperations() {
         CoroutineScope(Dispatchers.IO).launch {
-
             ApiStorage.initialize(requireContext())
-            val selectedAPI = ApiStorage.getSelectedApi()!!
-            withContext(Dispatchers.Main){
-                val API_KEY = selectedAPI.apiKey
-                val SECRET_KEY = selectedAPI?.secretKey
-                binanceAccountOperations = BinanceAccountOperations()
+            val selectedAPI = ApiStorage.getSelectedApi()
+            withContext(Dispatchers.Main) {
+                val API_KEY = selectedAPI?.apiKey ?: ""
+                val SECRET_KEY = selectedAPI?.secretKey ?: ""
+                binanceAccountOperations = BinanceAccountOperations(API_KEY, SECRET_KEY)
+                Toast.makeText(context, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
+                onAccountOperationsInitialized()
             }
-
-
         }
     }
 
-
-
+    private fun onAccountOperationsInitialized() {
+        BotManagerStorage.initialize(requireContext())
+        setupRecyclerView()
+        setupButtonListeners()
+        updateAccountBalance()
+    }
 }
-

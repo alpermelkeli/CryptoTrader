@@ -27,22 +27,27 @@ import java.util.concurrent.CompletableFuture
 class BotDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBotDetailsBinding
     private lateinit var binanceAccountOperations : BinanceAccountOperations
-    private lateinit var tradeList: MutableList<Trade>
     private lateinit var adapter: TradesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState)
-        binanceAccountOperations = BinanceAccountOperations()
+
         binding = ActivityBotDetailsBinding.inflate(layoutInflater)
 
+        val botManagerID = intent.getStringExtra("id")
+
+        val API_KEY = intent.getStringExtra("API_KEY")!!
+
+        val SECRET_KEY = intent.getStringExtra("SECRET_KEY")!!
+
+        initializeAccountOperations(API_KEY,SECRET_KEY)
 
         setContentView(binding.root)
 
         binding.tradeHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        val botManagerID = intent.getStringExtra("id")
 
         setUpWebView()
 
@@ -131,16 +136,8 @@ class BotDetailsActivity : AppCompatActivity() {
             startService(intent)
         }
     }
-    private fun initializeAccountOperations() {
-        CoroutineScope(Dispatchers.IO).launch {
-            ApiStorage.initialize(applicationContext)
-            val selectedAPI = ApiStorage.getSelectedApi()
-            withContext(Dispatchers.Main){
-                val API_KEY = selectedAPI?.apiKey
-                val SECRET_KEY = selectedAPI?.secretKey
-                binanceAccountOperations = BinanceAccountOperations()
-                Toast.makeText(applicationContext, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
-            }
-        }
+    private fun initializeAccountOperations(API_KEY:String,SECRET_KEY:String) {
+        binanceAccountOperations = BinanceAccountOperations(API_KEY,SECRET_KEY)
+        Toast.makeText(applicationContext, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
     }
 }

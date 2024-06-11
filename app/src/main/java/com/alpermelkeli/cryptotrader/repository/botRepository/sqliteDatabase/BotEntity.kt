@@ -8,6 +8,7 @@ data class BotEntity(
     val threshold: Double,
     val amount: Double,
     val exchangeMarket: String,
-    val status: String
+    val status: String,
+    val apiKey: String,
+    val secretKey: String
 )
-
