@@ -25,6 +25,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startForegroundService
+import androidx.lifecycle.lifecycleScope
 import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 
@@ -214,6 +215,21 @@ class HomeFragment : Fragment() {
         intent.putExtra("firstPairName",tradingBot.firstPairName)
         intent.putExtra("secondPairName",tradingBot.secondPairName)
         startActivity(intent)
+    }
+
+    private fun initializeAccountOperations() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            ApiStorage.initialize(requireContext())
+            val selectedAPI = ApiStorage.getSelectedApi()!!
+            withContext(Dispatchers.Main){
+                val API_KEY = selectedAPI.apiKey
+                val SECRET_KEY = selectedAPI?.secretKey
+                binanceAccountOperations = BinanceAccountOperations()
+            }
+
+
+        }
     }
 
 

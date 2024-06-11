@@ -7,11 +7,13 @@ import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.databinding.ActivityBotDetailsBinding
 import com.alpermelkeli.cryptotrader.model.Trade
+import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
@@ -24,7 +26,7 @@ import java.util.concurrent.CompletableFuture
 
 class BotDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBotDetailsBinding
-    private val binanceAccountOperations = BinanceAccountOperations()
+    private lateinit var binanceAccountOperations : BinanceAccountOperations
     private lateinit var tradeList: MutableList<Trade>
     private lateinit var adapter: TradesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +34,7 @@ class BotDetailsActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState)
-
+        binanceAccountOperations = BinanceAccountOperations()
         binding = ActivityBotDetailsBinding.inflate(layoutInflater)
 
 
@@ -127,6 +129,18 @@ class BotDetailsActivity : AppCompatActivity() {
             startForegroundService(intent)
         } else {
             startService(intent)
+        }
+    }
+    private fun initializeAccountOperations() {
+        CoroutineScope(Dispatchers.IO).launch {
+            ApiStorage.initialize(applicationContext)
+            val selectedAPI = ApiStorage.getSelectedApi()
+            withContext(Dispatchers.Main){
+                val API_KEY = selectedAPI?.apiKey
+                val SECRET_KEY = selectedAPI?.secretKey
+                binanceAccountOperations = BinanceAccountOperations()
+                Toast.makeText(applicationContext, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ class TradingBotsAdapter(
         holder.coinPairName.text = bot.pairName
         holder.coinImage.setImageResource(R.drawable.btc_vector)
         holder.exchangeMarketText.text = bot.exchangeMarket
+        if(bot.status=="Passive") holder.activeText.setTextColor(Color.RED)
         holder.activeText.text = bot.status
     }
 

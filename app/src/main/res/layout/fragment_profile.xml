@@ -26,7 +26,8 @@
                 android:textSize="18sp"
                 android:text="Profil Ayarları" />
 
-            <androidx.appcompat.widget.AppCompatButton                android:id="@+id/btnApiSettings"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnApiSettings"
                 android:layout_width="match_parent"
                 android:background="@drawable/configure_bot_component_background"
                 android:layout_height="60dp"
@@ -35,6 +36,18 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/lato_bold"
                 android:text="API Ayarları" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/stopServiceButton"
+                android:layout_width="match_parent"
+                android:background="@drawable/passive_button_background"
+                android:layout_height="60dp"
+                android:textSize="18sp"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/lato_bold"
+                android:text="Servisi Durdur."
+                />
+
 
 
         </LinearLayout>
