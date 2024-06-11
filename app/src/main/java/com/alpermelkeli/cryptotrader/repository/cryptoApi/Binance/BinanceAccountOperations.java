@@ -5,7 +5,6 @@ import com.alpermelkeli.cryptotrader.repository.cryptoApi.AccountOperations;
 
 import okhttp3.*;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.crypto.Mac;
@@ -22,8 +21,8 @@ import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
 public class BinanceAccountOperations implements AccountOperations{
-    private static final String API_URL = "https://testnet.binance.vision/api/v3/account";
-    private static final String BASE_URL = "https://testnet.binance.vision/api";
+    private static final String API_URL = "https://api.binance.com/api/v3/account";
+    private static final String BASE_URL = "https://api.binance.com/api";
 
     private String API_KEY;
     private String API_SECRET;
@@ -160,7 +159,7 @@ public class BinanceAccountOperations implements AccountOperations{
                 String signature = generateSignature(queryString);
                 queryString += "&signature=" + encode(signature);
 
-                HttpUrl httpUrl = HttpUrl.parse("https://testnet.binance.vision/api/v3/myTrades")
+                HttpUrl httpUrl = HttpUrl.parse(BASE_URL+"/v3/myTrades")
                         .newBuilder()
                         .encodedQuery(queryString)
                         .build();

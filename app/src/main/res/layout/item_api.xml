@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="10dp"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_height="70dp">
+    android:layout_height="70dp"
+    android:gravity="center"
+    android:background="@drawable/configure_bot_component_background"
+    android:padding="10dp"
+    >
 
     <TextView
         android:id="@+id/exchangeMarket"
         android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:layout_height="30dp"
+        android:textColor="@color/white"
+        android:textAlignment="textStart"
         android:text="Exchange Market"
         android:textSize="16sp"
         tools:layout_editor_absoluteX="128dp"
@@ -17,9 +24,12 @@
 
     <TextView
         android:id="@+id/apiKey"
+        android:padding="7dp"
         android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
+        android:layout_weight="0.7"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:layout_height="30dp"
         android:text="API Key"
         android:textSize="14sp"
         />
@@ -27,16 +37,22 @@
     <TextView
         android:id="@+id/secretKey"
         android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:text="Secret Key"
+        android:layout_weight="0.7"
+        android:padding="7dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:layout_height="30dp"
+        android:layout_marginRight="10dp"
+        android:text="**********"
         android:textSize="14sp"
         />
-    <Button
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete"
+        android:layout_width="21dp"
+        android:layout_height="26dp"
+        android:layout_weight="0.01"
+        android:background="@drawable/trash_icon"
         tools:layout_editor_absoluteX="306dp"
         tools:layout_editor_absoluteY="42dp" />
 </LinearLayout>

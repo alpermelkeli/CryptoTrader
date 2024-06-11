@@ -86,6 +86,17 @@ object BotManagerStorage {
             botManagers[bot.id] = botManager
         }
     }
+    fun removeAllBots() {
+        // Stop and remove all bots from memory
+        for (botManager in botManagers.values) {
+            botManager.stop()
+        }
+        botManagers.clear()
+
+        // Remove all bots from the database
+        dbHelper.deleteAllBots()
+    }
+
 
 
 }

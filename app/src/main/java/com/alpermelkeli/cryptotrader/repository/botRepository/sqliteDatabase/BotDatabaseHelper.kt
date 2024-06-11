@@ -113,4 +113,10 @@ class BotDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
         statement.executeUpdateDelete()
         db.close()
     }
+    fun deleteAllBots() {
+        val db = writableDatabase
+        val deleteQuery = "DELETE FROM $TABLE_NAME"
+        db.execSQL(deleteQuery)
+        db.close()
+    }
 }

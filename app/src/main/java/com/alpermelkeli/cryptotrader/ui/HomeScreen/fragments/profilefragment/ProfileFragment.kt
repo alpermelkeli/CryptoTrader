@@ -49,6 +49,9 @@ class ProfileFragment : Fragment() {
         findNavController().navigate(R.id.action_profileFragment_to_apiSettingsFragment)
         (activity as? HomeScreen)?.hideBottomNavigationView()
     }
+    /*
+    TODO: check this function
+ */
     private fun stopAllServices() {
         val intent = Intent(context, BotService::class.java)
         context?.stopService(intent)

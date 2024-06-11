@@ -32,12 +32,26 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/addApiButton"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/informationText"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="Seçmek istediğiniz api'nin üzerine tıklayınız."
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/apiRecyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/addApiButton"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="@drawable/update_button_background"

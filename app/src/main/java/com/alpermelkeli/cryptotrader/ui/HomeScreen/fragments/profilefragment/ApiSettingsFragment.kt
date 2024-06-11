@@ -86,6 +86,6 @@ class ApiSettingsFragment : Fragment() {
     }
     private fun selectApi(apiEntity: ApiEntity){
         ApiStorage.setSelectedApi(apiEntity)
-        Toast.makeText(context, apiEntity.apiKey+ "selected" , Toast.LENGTH_LONG).show()
+        Toast.makeText(context, apiEntity.apiKey.get(0) + "selected" , Toast.LENGTH_LONG).show()
     }
 }

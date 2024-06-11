@@ -138,6 +138,5 @@ class BotDetailsActivity : AppCompatActivity() {
     }
     private fun initializeAccountOperations(API_KEY:String,SECRET_KEY:String) {
         binanceAccountOperations = BinanceAccountOperations(API_KEY,SECRET_KEY)
-        Toast.makeText(applicationContext, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
     }
 }

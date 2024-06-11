@@ -226,7 +226,6 @@ class HomeFragment : Fragment() {
                 val API_KEY = selectedAPI?.apiKey ?: ""
                 val SECRET_KEY = selectedAPI?.secretKey ?: ""
                 binanceAccountOperations = BinanceAccountOperations(API_KEY, SECRET_KEY)
-                Toast.makeText(context, "INITIALIZED $API_KEY", Toast.LENGTH_LONG).show()
                 onAccountOperationsInitialized()
             }
         }
