@@ -68,24 +68,45 @@ object BotManagerStorage {
         dbHelper.removeBotById(id)
     }
 
+    /**
+     * This is the main resolved function now it doesn't create new object if this bot exist before
+     * so now we can access same object reference and do operations that we want to do.
+     */
     private fun loadBotsFromDatabase() {
         val bots = dbHelper.getAllBots()
         for (bot in bots) {
-            val botManager = BotManager(
-                bot.id,
-                bot.firstPairName,
-                bot.secondPairName,
-                bot.pairName,
-                bot.threshold,
-                bot.amount,
-                bot.exchangeMarket,
-                bot.status,
-                bot.apiKey,
-                bot.secretKey
-            )
-            botManagers[bot.id] = botManager
+            if (botManagers.containsKey(bot.id)) {
+                // BotManager zaten varsa güncelle YOKSA YENİ OBJE OLUŞTURULUYOR VE ONUN FONKSİYONLARI ÇAĞRILIYOR!
+                val botManager = botManagers[bot.id]!!
+                botManager.firstPairName = bot.firstPairName
+                botManager.secondPairName = bot.secondPairName
+                botManager.pairName = bot.pairName
+                botManager.threshold = bot.threshold
+                botManager.amount = bot.amount
+                botManager.exchangeMarket = bot.exchangeMarket
+                botManager.status = bot.status
+                botManager.apiKey = bot.apiKey
+                botManager.secretKey = bot.secretKey
+                // BotManager güncellendiğinde diğer işlemleri yapabilirsiniz (örneğin, yeniden başlatma)
+            } else {
+                // Yeni bir BotManager oluştur
+                val botManager = BotManager(
+                    bot.id,
+                    bot.firstPairName,
+                    bot.secondPairName,
+                    bot.pairName,
+                    bot.threshold,
+                    bot.amount,
+                    bot.exchangeMarket,
+                    bot.status,
+                    bot.apiKey,
+                    bot.secretKey
+                )
+                botManagers[bot.id] = botManager
+            }
         }
     }
+
     fun removeAllBots() {
         // Stop and remove all bots from memory
         for (botManager in botManagers.values) {

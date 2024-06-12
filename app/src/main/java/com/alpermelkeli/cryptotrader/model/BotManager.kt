@@ -10,15 +10,15 @@ import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSock
 
 class BotManager(
     val id: String,
-    val firstPairName: String,
-    val secondPairName: String,
-    val pairName: String,
+    var firstPairName: String,
+    var secondPairName: String,
+    var pairName: String,
     var threshold: Double,
     var amount: Double,
-    val exchangeMarket: String,
+    var exchangeMarket: String,
     var status: String,
-    val apiKey: String,
-    val secretKey: String
+    var apiKey: String,
+    var secretKey: String
 ) {
     private val binanceAccountOperations = BinanceAccountOperations(apiKey,secretKey)
     private val thresholdManager: ThresholdManager = ThresholdManager()
@@ -57,6 +57,7 @@ class BotManager(
     }
 
     private fun handlePriceUpdate(currentPrice: Double) {
+        println("Bot id at botManager: $id")
         val buyThreshold = thresholdManager.getBuyThreshold(pairName)
         val sellThreshold = thresholdManager.getSellThreshold(pairName)
 

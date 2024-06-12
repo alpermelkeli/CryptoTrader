@@ -14,6 +14,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
+import com.alpermelkeli.cryptotrader.model.BotManager
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.HomeScreen
 import kotlinx.coroutines.*
@@ -24,10 +25,12 @@ import kotlinx.coroutines.*
  * BotManagerStorage(RAM) that has BotManager objects that has management features inside.
  */
 class BotService : Service() {
-    private val botManagers = BotManagerStorage.getBotManagers()
+    private lateinit var botManagers : MutableMap<String,BotManager>
 
     override fun onCreate() {
         super.onCreate()
+        BotManagerStorage.initialize(applicationContext)
+        botManagers = BotManagerStorage.getBotManagers()
         createNotificationChannel()
         instance = this
         Log.d("BotService", "Service created")
@@ -107,6 +110,7 @@ class BotService : Service() {
         BotManagerStorage.updateBotManager(id, botManager)
         Toast.makeText(applicationContext, "Bot started", Toast.LENGTH_LONG).show()
             Log.d("BotService", "Bot $id started")
+        botManagers = BotManagerStorage.getBotManagers()
     }
 
 
@@ -126,6 +130,7 @@ class BotService : Service() {
             Toast.makeText(application, "Bot started again", Toast.LENGTH_LONG).show()
         }
         BotManagerStorage.updateBotManager(id, botManager)
+        botManagers = BotManagerStorage.getBotManagers()
     }
 
 
@@ -136,6 +141,7 @@ class BotService : Service() {
         BotManagerStorage.updateBotManager(id, botManager)
         Toast.makeText(applicationContext, "Bot stopped", Toast.LENGTH_LONG).show()
         Log.d("BotService", "Bot $id stopped")
+        botManagers = BotManagerStorage.getBotManagers()
     }
 
     companion object {

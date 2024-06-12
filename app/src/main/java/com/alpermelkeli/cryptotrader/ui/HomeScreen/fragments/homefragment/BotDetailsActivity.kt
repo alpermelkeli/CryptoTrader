@@ -55,9 +55,9 @@ class BotDetailsActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener { finish() }
 
-        binding.passiveButton.setOnClickListener { botManagerID?.let { stopTradingBot(it) } }
+        binding.passiveButton.setOnClickListener { stopTradingBot(botManagerID) }
 
-        binding.updateButton.setOnClickListener {  botManagerID?.let { updateTradingBot(it,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }}
+        binding.updateButton.setOnClickListener { updateTradingBot(botManagerID,binding.amountEditText.text.toString().toDouble(), binding.thresholdEditText.text.toString().toDouble()) }
     }
 
     private fun setUpView(botManagerID:String){
