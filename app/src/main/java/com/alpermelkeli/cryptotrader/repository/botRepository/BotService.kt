@@ -98,13 +98,21 @@ class BotService : Service() {
 
 
     private fun updateBot(id: String, amount: Double, threshold: Double) {
-        println(botManagers.toString())
         val botManager = botManagers[id]!!
-        botManager.update(amount, threshold)
-        botManager.status = "Active"
+        if(botManager.status=="Active"){
+            botManager.update(amount, threshold)
+            Toast.makeText(application, "Bot updated", Toast.LENGTH_LONG).show()
+            Log.d("BotService", "Bot $id updated")
+        }
+        else{
+            botManager.amount = amount
+            botManager.threshold = threshold
+            botManager.openPosition = false
+            botManager.start()
+            botManager.status = "Active"
+            Toast.makeText(application, "Bot started again", Toast.LENGTH_LONG).show()
+        }
         BotManagerStorage.updateBotManager(id, botManager)
-        Toast.makeText(application, "Bot updated", Toast.LENGTH_LONG).show()
-        Log.d("BotService", "Bot $id updated")
     }
 
 

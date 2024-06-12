@@ -19,7 +19,7 @@ class BotManager(
 ) {
     private val binanceAccountOperations = BinanceAccountOperations(apiKey,secretKey)
     private val thresholdManager: ThresholdManager = ThresholdManager()
-    private var openPosition: Boolean = false
+    var openPosition: Boolean = false
     private var webSocketManager: BinanceWebSocketManager? = null
 
     fun start() {
@@ -34,9 +34,7 @@ class BotManager(
         webSocketManager = BinanceWebSocketManager(listener)
         webSocketManager!!.connect(pairName)
     }
-
     fun update(amount: Double, threshold: Double) {
-        stop()
         this.amount = amount
         this.threshold = threshold
 
@@ -46,14 +44,6 @@ class BotManager(
             thresholdManager.setBuyThreshold(pairName, threshold)
         }
 
-        val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
-            override fun onPriceUpdate(price: String) {
-                val currentPrice = price.toDouble()
-                handlePriceUpdate(currentPrice)
-            }
-        }
-        webSocketManager = BinanceWebSocketManager(listener)
-        webSocketManager!!.connect(pairName)
     }
 
     fun stop() {
