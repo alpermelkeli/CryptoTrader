@@ -203,7 +203,9 @@ public class BinanceAccountOperations implements AccountOperations{
         });
     }
     @Override
-    public void buyCoin(String symbol, double quantity) {
+    public CompletableFuture<Boolean> buyCoin(String symbol, double quantity) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
         try {
             String endpoint = "/v3/order";
             String url = BASE_URL + endpoint;
@@ -225,24 +227,33 @@ public class BinanceAccountOperations implements AccountOperations{
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
+                    future.complete(false);
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
                         System.out.println("Buy order placed successfully");
+                        future.complete(true);
                     } else {
                         System.out.println("Failed to place buy order: " + response.code() + " | " + response.message() + " | " + response.body().string());
+                        future.complete(false);
                     }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            future.complete(false);
         }
+
+        return future;
     }
 
+
     @Override
-    public void sellCoin(String symbol, double quantity) {
+    public CompletableFuture<Boolean> sellCoin(String symbol, double quantity) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
         try {
             String endpoint = "/v3/order";
             String url = BASE_URL + endpoint;
@@ -264,21 +275,28 @@ public class BinanceAccountOperations implements AccountOperations{
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
+                    future.complete(false);
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
                         System.out.println("Sell order placed successfully");
+                        future.complete(true);
                     } else {
-                        System.out.println("Failed to place sell order: " + response.message() + " | " + response.body().string());
+                        System.out.println("Failed to place sell order: " + response.code() + " | " + response.message() + " | " + response.body().string());
+                        future.complete(false);
                     }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            future.complete(false);
         }
+
+        return future;
     }
+
 
     private String convertMillisToDate(long millis) {
         Date date = new Date(millis);

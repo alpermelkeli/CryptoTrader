@@ -1,11 +1,11 @@
 package com.alpermelkeli.cryptotrader.repository.botRepository
 
-import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
@@ -14,8 +14,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
+import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.HomeScreen
 import kotlinx.coroutines.*
+
+
 /**
  * This class provides foreground service for the android app. It is manage bots by fetching data with using
  * BotManagerStorage(RAM) that has BotManager objects that has management features inside.
@@ -26,6 +29,7 @@ class BotService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        instance = this
         Log.d("BotService", "Service created")
     }
 
@@ -86,6 +90,15 @@ class BotService : Service() {
             .setContentIntent(pendingIntent)
             .build()
     }
+    private fun sendNotificationInternal(title: String, message: String) {
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.drawable.btc_vector)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+        notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+    }
 
     private fun startBot(id: String) {
         val botManager = botManagers[id]!!
@@ -126,6 +139,12 @@ class BotService : Service() {
     }
 
     companion object {
-        const val CHANNEL_ID = "BotServiceChannel"
+        private const val CHANNEL_ID = "BotServiceChannel"
+        private lateinit var instance: BotService
+
+        fun sendNotification(title: String, message: String) {
+            instance.sendNotificationInternal(title, message)
+        }
     }
+
 }
