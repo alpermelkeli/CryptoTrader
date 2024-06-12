@@ -1,9 +1,12 @@
 package com.alpermelkeli.cryptotrader.model
 
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
-import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
+import android.content.Context
+import android.content.Intent
+import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ThresholdManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
+import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
 
 class BotManager(
     val id: String,
@@ -40,8 +43,10 @@ class BotManager(
 
         if (openPosition) {
             thresholdManager.setSellThreshold(pairName, threshold)
-        } else {
+        }
+        else {
             thresholdManager.setBuyThreshold(pairName, threshold)
+            thresholdManager.removeSellThreshold(pairName)
         }
 
     }
@@ -59,19 +64,54 @@ class BotManager(
         println("Buy threshold of $pairName = $buyThreshold")
         println("Sell threshold of $pairName = $sellThreshold")
         println("Open position of $pairName = $openPosition")
-
         if (!openPosition && buyThreshold != null && currentPrice > buyThreshold) {
             binanceAccountOperations.buyCoin(pairName, amount)
-            openPosition = true
-            thresholdManager.setSellThreshold(pairName, buyThreshold)
-            thresholdManager.removeBuyThreshold(pairName)
+                .thenAccept { success: Boolean ->
+                    if (success) {
+                        openPosition = true
+                        thresholdManager.setSellThreshold(pairName, buyThreshold)
+                        thresholdManager.removeBuyThreshold(pairName)
+                        println("Buy order executed successfully.")
+                        BotService.sendNotification("Buy Order", "Buy order for $pairName executed successfully.")
+
+                    } else {
+                        println("Buy order failed. Please check the logs for more details.")
+                        BotService.sendNotification("Buy Order Failed", "Buy order for $pairName failed. Please check the logs for more details.")
+
+
+                    }
+                }
+                .exceptionally { ex: Throwable ->
+                    println("An error occurred during buy operation: " + ex.message)
+                    BotService.sendNotification("Buy Order Error", "An error occurred during buy operation for $pairName: ${ex.message}")
+                    ex.printStackTrace()
+                    null
+                }
         }
 
         if (openPosition && sellThreshold != null && currentPrice < sellThreshold) {
             binanceAccountOperations.sellCoin(pairName, amount)
-            openPosition = false
-            thresholdManager.removeSellThreshold(pairName)
-            thresholdManager.setBuyThreshold(pairName, threshold)
+                .thenAccept { success: Boolean ->
+                    if (success) {
+                        openPosition = false
+                        thresholdManager.removeSellThreshold(pairName)
+                        thresholdManager.setBuyThreshold(pairName, threshold)
+                        println("Sell order executed successfully.")
+                        BotService.sendNotification("Sell Order", "Sell order for $pairName executed successfully.")
+                    } else {
+                        println("Sell order failed. Please check the logs for more details.")
+                        BotService.sendNotification("Sell Order Failed", "Sell order for $pairName failed. Please check the logs for more details.")
+                    }
+                }
+                .exceptionally { ex: Throwable ->
+                    println("An error occurred during sell operation: " + ex.message)
+                    BotService.sendNotification("Sell Order Error", "An error occurred during sell operation for $pairName: ${ex.message}")
+                    ex.printStackTrace()
+                    null
+                }
         }
+
     }
+
+
 }
