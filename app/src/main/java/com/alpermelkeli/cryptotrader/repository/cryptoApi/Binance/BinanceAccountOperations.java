@@ -99,7 +99,16 @@ public class BinanceAccountOperations implements AccountOperations{
                 double totalBalance = 0.0;
                 for (int i = 0; i < balances.length(); i++) {
                     JSONObject balance = balances.getJSONObject(i);
-                    totalBalance += balance.getDouble("free") + balance.getDouble("locked");
+                    String asset = balance.getString("asset");
+                    double free = balance.getDouble("free");
+                    double locked = balance.getDouble("locked");
+
+                    if(asset.equals("USDT")){
+                        totalBalance+=free+locked;
+                    }
+                    else if(free+locked!=0){
+                        totalBalance += convertToUSDT(balance.getString("asset"),balance.getDouble("free") + balance.getDouble("locked"));
+                    }
                 }
                 return totalBalance;
             }
@@ -109,6 +118,35 @@ public class BinanceAccountOperations implements AccountOperations{
             return 0.0;
         }
     }
+    private double convertToUSDT(String asset, double amount) {
+        try {
+            // API endpoint to get the price of the asset in USDT
+            String tickerPriceUrl = "https://api.binance.com/api/v3/ticker/price?symbol=" + asset + "USDT";
+
+            Request request = new Request.Builder()
+                    .url(tickerPriceUrl)
+                    .addHeader("X-MBX-APIKEY", API_KEY)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+
+                String responseBody = response.body().string();
+                JSONObject priceJson = new JSONObject(responseBody);
+                double price = priceJson.getDouble("price");
+
+                // Return the amount in USDT
+                return amount * price;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
 
     @Override
     public double getSelectedCoinQuantity(String asset) {
