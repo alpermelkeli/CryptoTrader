@@ -53,8 +53,7 @@ class ProfileFragment : Fragment() {
     TODO: check this function
  */
     private fun stopAllServices() {
-        val intent = Intent(context, BotService::class.java)
-        context?.stopService(intent)
-        Toast.makeText(context,"Servis durduruldu tüm botları yeniden konfigüre etmelisiniz",Toast.LENGTH_LONG).show()
+        BotService.stopService()
+        Toast.makeText(context, "Servis durduruldu, tüm botları yeniden konfigüre etmelisiniz", Toast.LENGTH_LONG).show()
     }
 }

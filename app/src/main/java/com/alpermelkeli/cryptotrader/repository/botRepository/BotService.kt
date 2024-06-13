@@ -46,6 +46,7 @@ class BotService : Service() {
             "START_BOT" -> startBot(botID)
             "UPDATE_BOT" -> updateBot(botID, amount, threshold)
             "STOP_BOT" -> stopBot(botID)
+            "STOP_ALL_BOTS" -> stopAllBots()
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -143,6 +144,16 @@ class BotService : Service() {
         Log.d("BotService", "Bot $id stopped")
         botManagers = BotManagerStorage.getBotManagers()
     }
+    private fun stopAllBots() {
+        for ((id, botManager) in botManagers) {
+            botManager.stop()
+            botManager.status = "Passive"
+            BotManagerStorage.updateBotManager(id, botManager)
+        }
+        Log.d("BotService", "All bots stopped")
+        botManagers = BotManagerStorage.getBotManagers()
+        stopSelf()
+    }
 
     companion object {
         private const val CHANNEL_ID = "BotServiceChannel"
@@ -151,6 +162,10 @@ class BotService : Service() {
         fun sendNotification(title: String, message: String) {
             instance.sendNotificationInternal(title, message)
         }
+        fun stopService() {
+            instance.stopAllBots()
+        }
+
     }
 
 }
