@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.QuickContactBadge
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.alpermelkeli.cryptotrader.R
@@ -26,7 +27,6 @@ import kotlinx.coroutines.*
  */
 class BotService : Service() {
     private lateinit var botManagers : MutableMap<String,BotManager>
-
     override fun onCreate() {
         super.onCreate()
         BotManagerStorage.initialize(applicationContext)
@@ -37,30 +37,16 @@ class BotService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val action = intent.action
-        val botID = intent.getStringExtra("id")!!
-        val amount = intent.getDoubleExtra("amount", 0.0)
-        val threshold = intent.getDoubleExtra("threshold", 0.0)
 
-        when (action) {
-            "START_BOT" -> startBot(botID)
-            "UPDATE_BOT" -> updateBot(botID, amount, threshold)
-            "STOP_BOT" -> stopBot(botID)
-            "STOP_ALL_BOTS" -> stopAllBots()
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(1, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+            } else {
+                startForeground(1, createNotification())
+            }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(1, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-        } else {
-            startForeground(1, createNotification())
-        }
-
-        return START_STICKY
+        return START_NOT_STICKY
     }
-
-
     override fun onBind(intent: Intent): IBinder? = null
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -73,7 +59,6 @@ class BotService : Service() {
             notificationManager.createNotificationChannel(channel)
         }
     }
-
     private fun createNotification(): Notification {
         createNotificationChannel()
 
@@ -89,7 +74,7 @@ class BotService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("CryptoTrader")
-            .setContentText("Active Bots: $activeBotInfo")
+            .setContentText("Servis Aktif!")
             .setSmallIcon(R.drawable.market_icon)
             .setContentIntent(pendingIntent)
             .build()
@@ -103,7 +88,10 @@ class BotService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
         notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        println("Service destroyed.")
+    }
     private fun startBot(id: String) {
         val botManager = botManagers[id]!!
         botManager.start()
@@ -113,8 +101,6 @@ class BotService : Service() {
             Log.d("BotService", "Bot $id started")
         botManagers = BotManagerStorage.getBotManagers()
     }
-
-
     private fun updateBot(id: String, amount: Double, threshold: Double) {
         val botManager = botManagers[id]!!
         if(botManager.status=="Active"){
@@ -133,8 +119,6 @@ class BotService : Service() {
         BotManagerStorage.updateBotManager(id, botManager)
         botManagers = BotManagerStorage.getBotManagers()
     }
-
-
     private fun stopBot(id: String) {
         val botManager = botManagers[id]!!
         botManager.stop()
@@ -145,16 +129,27 @@ class BotService : Service() {
         botManagers = BotManagerStorage.getBotManagers()
     }
     private fun stopAllBots() {
-        for ((id, botManager) in botManagers) {
-            botManager.stop()
-            botManager.status = "Passive"
-            BotManagerStorage.updateBotManager(id, botManager)
+        CoroutineScope(Dispatchers.IO).launch {
+            // Copy the botManagers to avoid ConcurrentModificationException
+            val botManagersCopy = botManagers.toMap()
+
+            for ((id, botManager) in botManagersCopy) {
+                botManager.stop()
+                botManager.status = "Passive"
+                BotManagerStorage.updateBotManager(id, botManager)
+            }
+
+            withContext(Dispatchers.Main) {
+                Log.d("BotService", "All bots stopped")
+                botManagers = BotManagerStorage.getBotManagers()
+                stopSelf()
+            }
         }
-        Log.d("BotService", "All bots stopped")
-        botManagers = BotManagerStorage.getBotManagers()
-        stopSelf()
     }
 
+    /**
+     * Botla alakalı her şeyi buraya çekmeyi dene bot açma bot kapatma vs.
+     */
     companion object {
         private const val CHANNEL_ID = "BotServiceChannel"
         private lateinit var instance: BotService
@@ -164,6 +159,15 @@ class BotService : Service() {
         }
         fun stopService() {
             instance.stopAllBots()
+        }
+        fun startBot(botId: String){
+            instance.startBot(botId)
+        }
+        fun updateBot(botId: String, amount: Double,threshold: Double){
+            instance.updateBot(botId,amount,threshold)
+        }
+        fun stopBot(botId: String){
+            instance.stopBot(botId)
         }
 
     }

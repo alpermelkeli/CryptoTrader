@@ -49,11 +49,10 @@ class ProfileFragment : Fragment() {
         findNavController().navigate(R.id.action_profileFragment_to_apiSettingsFragment)
         (activity as? HomeScreen)?.hideBottomNavigationView()
     }
-    /*
-    TODO: check this function
- */
+
     private fun stopAllServices() {
         BotService.stopService()
         Toast.makeText(context, "Servis durduruldu, tüm botları yeniden konfigüre etmelisiniz", Toast.LENGTH_LONG).show()
+        activity?.finish()
     }
 }

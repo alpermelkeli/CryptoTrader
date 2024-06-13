@@ -37,8 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var tradingBots: MutableList<TradingBot>
     private lateinit var adapter: TradingBotsAdapter
     private lateinit var binanceAccountOperations: BinanceAccountOperations
-    private val REQUEST_FOREGROUND_PERMISSION = 1
-    private val REQUEST_DATA_SYNC_PERMISSION = 2
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -109,7 +108,6 @@ class HomeFragment : Fragment() {
             .setTitle("Yeni Bot Ekle")
             .setView(dialogView)
             .setPositiveButton("Ekle") { _, _ ->
-                checkAndRequestForegroundServicePermission()
                 val firstPairName = firstPairNameEditText.text.toString()
                 val secondPairName = secondPairNameEditText.text.toString()
                 val pairName =  firstPairName + secondPairName
@@ -141,61 +139,9 @@ class HomeFragment : Fragment() {
         return "BOT_" + System.currentTimeMillis().toString()
     }
 
-    private fun checkAndRequestForegroundServicePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            if (context?.checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.FOREGROUND_SERVICE), REQUEST_FOREGROUND_PERMISSION)
-            } else {
-                checkAndRequestDataSyncPermission()
-            }
-        } else {
-            checkAndRequestDataSyncPermission()
-        }
-    }
-
-    private fun checkAndRequestDataSyncPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (context?.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_DATA_SYNC_PERMISSION)
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_FOREGROUND_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkAndRequestDataSyncPermission()
-                } else {
-                    AlertDialog.Builder(context)
-                        .setMessage("Foreground service permission is required to start the trading bot.")
-                        .setPositiveButton("OK", null)
-                        .show()
-                }
-            }
-            REQUEST_DATA_SYNC_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                    AlertDialog.Builder(context)
-                        .setMessage("Data sync permission is required to start the trading bot.")
-                        .setPositiveButton("OK", null)
-                        .show()
-                }
-            }
-        }
-    }
 
     private fun startTradingBot(id: String) {
-        val intent = Intent(context, BotService::class.java).apply {
-            action = "START_BOT"
-            putExtra("id", id)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requireContext().startForegroundService(intent)
-        }
+        BotService.startBot(id)
     }
 
     private fun updateAccountBalance() {

@@ -160,28 +160,10 @@ class BotDetailsActivity : AppCompatActivity() {
 
     }
     private fun stopTradingBot(id: String) {
-        val intent = Intent(this, BotService::class.java).apply {
-            action = "STOP_BOT"
-            putExtra("id", id)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        BotService.stopBot(id)
     }
     private fun updateTradingBot(id:String,amount:Double,threshold:Double){
-        val intent = Intent(this, BotService::class.java).apply {
-            action = "UPDATE_BOT"
-            putExtra("id", id)
-            putExtra("amount",amount)
-            putExtra("threshold",threshold)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        BotService.updateBot(id,amount,threshold)
     }
     private fun initializeAccountOperations(API_KEY:String,SECRET_KEY:String) {
         binanceAccountOperations = BinanceAccountOperations(API_KEY,SECRET_KEY)
