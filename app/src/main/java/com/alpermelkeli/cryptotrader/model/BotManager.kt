@@ -1,7 +1,5 @@
 package com.alpermelkeli.cryptotrader.model
 
-import android.content.Context
-import android.content.Intent
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ThresholdManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
@@ -48,7 +46,6 @@ class BotManager(
             thresholdManager.setBuyThreshold(pairName, threshold)
             thresholdManager.removeSellThreshold(pairName)
         }
-
     }
 
     fun stop() {

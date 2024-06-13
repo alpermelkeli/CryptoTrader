@@ -210,6 +210,7 @@ class HomeFragment : Fragment() {
     private fun openBotDetailsActivity(tradingBot: TradingBot) {
         val intent = Intent(context, BotDetailsActivity::class.java).apply {
             putExtra("id", tradingBot.id)
+            putExtra("pairName", tradingBot.pairName)
             putExtra("API_KEY", binanceAccountOperations.apI_KEY)
             putExtra("SECRET_KEY", binanceAccountOperations.apI_SECRET)
             putExtra("firstPairName", tradingBot.firstPairName)

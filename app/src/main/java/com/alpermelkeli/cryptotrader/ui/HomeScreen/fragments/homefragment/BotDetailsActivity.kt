@@ -38,6 +38,8 @@ class BotDetailsActivity : AppCompatActivity() {
 
         val botManagerID = intent.getStringExtra("id")
 
+        val pairName = intent.getStringExtra("pairName")!!
+
         val API_KEY = intent.getStringExtra("API_KEY")!!
 
         val SECRET_KEY = intent.getStringExtra("SECRET_KEY")!!
@@ -48,8 +50,7 @@ class BotDetailsActivity : AppCompatActivity() {
 
         binding.tradeHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        setUpWebView()
+        setUpWebView(pairName)
 
         setUpView(botManagerID!!)
 
@@ -91,12 +92,58 @@ class BotDetailsActivity : AppCompatActivity() {
             }
         }
     }
-    private fun setUpWebView() {
+    private fun setUpWebView(pairName: String) {
         val webview = binding.tradingViewWebView
         webview.settings.javaScriptEnabled = true
         webview.webViewClient = WebViewClient()
-        val url = "file:///android_asset/tradingview.html"
-        webview.loadUrl(url)
+        //Dynamic html content.
+        val htmlContent = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>TradingView Chart</title>
+            <style>
+                body, html {
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+                .tradingview-widget-container {
+                    height: 100%;
+                    width: 100%;
+                }
+            </style>
+        </head>
+        <body>
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+            {
+              "autosize": true,
+              "symbol": "BINANCE:$pairName",
+              "interval": "240",
+              "timezone": "Europe/Istanbul",
+              "theme": "dark",
+              "style": "1",
+              "locale": "en",
+              "backgroundColor": "rgba(28, 23, 24, 1)",
+              "gridColor": "rgba(28, 23, 24, 1)",
+              "hide_legend": true,
+              "allow_symbol_change": true,
+              "calendar": false,
+              "support_host": "https://www.tradingview.com"
+            }
+            </script>
+        </div>
+        <!-- TradingView Widget END -->
+        </body>
+        </html>
+    """.trimIndent()
+
+        webview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
     }
     private fun getPairsQuantities(firstPair: String, secondPair: String) {
         lifecycleScope.launch {
