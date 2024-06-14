@@ -39,8 +39,9 @@ class MainActivity : AppCompatActivity() {
                 action = "START_SERVICE"
             }
             startService(intent)
+            Toast.makeText(applicationContext, "Servis başlatıldı botları kurmaya başlayabilirsiniz.", Toast.LENGTH_LONG).show()
+
         }
-        Toast.makeText(applicationContext, "Servis başlatıldı botları kurmaya başlayabilirsiniz.", Toast.LENGTH_LONG).show()
     }
 
     private fun isServiceRunning(serviceClass: Class<*>): Boolean {

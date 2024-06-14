@@ -45,7 +45,7 @@ class ApiSettingsFragment : Fragment() {
         val editTextSecretKey = dialogView.findViewById<EditText>(R.id.secretKeyEdittext)
         val buttonAddApi = dialogView.findViewById<Button>(R.id.addApiButtonEdittext)
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext(),R.style.AddBotButtonDialog)
             .setView(dialogView)
             .create()
 
@@ -58,6 +58,7 @@ class ApiSettingsFragment : Fragment() {
                 addNewApi(ApiEntity(exchangeMarket, apiKey, secretKey))
                 dialog.dismiss()
             } else {
+                Toast.makeText(requireContext(), "Lütfen doğru giriniz.",Toast.LENGTH_SHORT).show()
             }
         }
 

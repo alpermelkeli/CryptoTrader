@@ -2,12 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="15dp"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/configure_bot_component_background"
+    >
 
     <EditText
         android:id="@+id/firstPairEditText"
         android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:textColorHint="#737272"
         android:backgroundTint="#00FFFFFF"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -18,7 +23,8 @@
         android:id="@+id/secondPairEditText"
         android:layout_width="match_parent"
         android:backgroundTint="#00FFFFFF"
-
+        android:textColor="@color/white"
+        android:textColorHint="#737272"
         android:layout_height="wrap_content"
         android:hint="2.Coin Adı" />
 
@@ -26,6 +32,8 @@
         android:id="@+id/thresholdEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textColorHint="#737272"
         android:backgroundTint="#00FFFFFF"
         android:hint="Eşik Değeri"
         android:inputType="numberDecimal" />
@@ -33,9 +41,46 @@
     <EditText
         android:id="@+id/amountEditText"
         android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:textColorHint="#737272"
         android:layout_height="wrap_content"
         android:backgroundTint="#00FFFFFF"
         android:hint="İşlem Miktarı"
         android:inputType="numberDecimal" />
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal"
+        >
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancelAddBotButton"
+            android:layout_marginEnd="8dp"
+            android:layout_width="0dp"
+            android:background="@drawable/dialog_cancel_button_background"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:fontFamily="@font/lato_bold"
+            android:text="İptal"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addBotButton"
+            android:background="@drawable/dialog_add_button_background"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/lato_bold"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:layout_height="match_parent"
+            android:text="Ekle"
+            />
+    </LinearLayout>
 
 </LinearLayout>

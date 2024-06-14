@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.lifecycleScope
@@ -103,36 +104,43 @@ class HomeFragment : Fragment() {
         val secondPairNameEditText = dialogView.findViewById<EditText>(R.id.secondPairEditText)
         val thresholdEditText = dialogView.findViewById<EditText>(R.id.thresholdEditText)
         val amountEditText = dialogView.findViewById<EditText>(R.id.amountEditText)
+        val positiveButton = dialogView.findViewById<Button>(R.id.addBotButton)
+        val negativeButton = dialogView.findViewById<Button>(R.id.cancelAddBotButton)
 
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("Yeni Bot Ekle")
+        val dialog = AlertDialog.Builder(context,R.style.AddBotButtonDialog)
             .setView(dialogView)
-            .setPositiveButton("Ekle") { _, _ ->
-                val firstPairName = firstPairNameEditText.text.toString()
-                val secondPairName = secondPairNameEditText.text.toString()
-                val pairName =  firstPairName + secondPairName
-                val threshold = thresholdEditText.text.toString().toDoubleOrNull()
-                val amount = amountEditText.text.toString().toDoubleOrNull()
-
-                if (pairName.isNotEmpty() && threshold != null && amount != null) {
-                    val id = generateBotId()
-                    val newBot = TradingBot(id, R.drawable.btc_vector, "BINANCE", "Active", firstPairName, secondPairName, pairName)
-
-                    tradingBots.add(newBot)
-
-                    adapter.notifyItemInserted(tradingBots.size - 1)
-
-                    val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Active",binanceAccountOperations.apI_KEY,binanceAccountOperations.apI_SECRET)
-
-                    BotManagerStorage.addBotManager(botManager)
-
-                    startTradingBot(id)
-                }
-            }
-            .setNegativeButton("İptal", null)
             .create()
 
         dialog.show()
+
+
+        positiveButton.setOnClickListener {
+            val firstPairName = firstPairNameEditText.text.toString().uppercase().trim()
+            val secondPairName = secondPairNameEditText.text.toString().uppercase().trim()
+            val pairName =  firstPairName + secondPairName
+            val threshold = thresholdEditText.text.toString().toDoubleOrNull()
+            val amount = amountEditText.text.toString().toDoubleOrNull()
+
+            if (pairName.isNotEmpty() && threshold != null && amount != null) {
+                val id = generateBotId()
+                val newBot = TradingBot(id, R.drawable.btc_vector, "BINANCE", "Active", firstPairName, secondPairName, pairName)
+
+                tradingBots.add(newBot)
+
+                adapter.notifyItemInserted(tradingBots.size - 1)
+
+                val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Active", binanceAccountOperations.apI_KEY, binanceAccountOperations.apI_SECRET)
+
+                BotManagerStorage.addBotManager(botManager)
+
+                startTradingBot(id)
+                dialog.dismiss()
+            }
+        }
+        negativeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
     }
 
     private fun generateBotId(): String {

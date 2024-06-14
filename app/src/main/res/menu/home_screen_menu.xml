@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/market_icon"
-        android:title="Profil" />
+        android:title="Profil"
+        />
     <item
         android:id="@+id/walletFragment"
         android:layout_width="wrap_content"

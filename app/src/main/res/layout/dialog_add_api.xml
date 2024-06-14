@@ -3,30 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@drawable/configure_bot_component_background"
+    android:padding="20dp"
+    android:layout_margin="10dp"
+    >
 
     <EditText
         android:id="@+id/exchangeMarketEdittext"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:layout_height="40dp"
+        android:textColorHint="#888181"
+        android:textColor="@color/white"
         android:hint="Exchange Market" />
 
     <EditText
         android:id="@+id/apiKeyEdittext"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="API Key" />
+        android:background="#00FFFFFF"
+        android:layout_height="40dp"
+        android:hint="API Key"
+        android:textColor="@color/white"
+        android:textColorHint="#888181"
+        />
 
     <EditText
         android:id="@+id/secretKeyEdittext"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:layout_height="40dp"
+        android:textColorHint="#888181"
+        android:textColor="@color/white"
         android:hint="Secret Key" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/addApiButtonEdittext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add" />
+        android:layout_gravity="end"
+        android:textAllCaps="false"
+        android:fontFamily="@font/lato_bold"
+        android:textColor="@color/white"
+        android:background="@drawable/dialog_add_button_background"
+        android:layout_width="140dp"
+        android:layout_height="50dp"
+        android:textSize="16sp"
+        android:text="Ekle" />
 
 </LinearLayout>

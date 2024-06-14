@@ -77,6 +77,7 @@ class BotService : Service() {
             .setContentText("Servis Aktif!")
             .setSmallIcon(R.drawable.market_icon)
             .setContentIntent(pendingIntent)
+            .setOngoing(true)
             .build()
     }
     private fun sendNotificationInternal(title: String, message: String) {
