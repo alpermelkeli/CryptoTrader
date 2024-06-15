@@ -28,7 +28,8 @@ object BotManagerStorage {
                 botManager.exchangeMarket,
                 botManager.status,
                 botManager.apiKey,
-                botManager.secretKey
+                botManager.secretKey,
+                botManager.openPosition
             )
         )
     }
@@ -56,7 +57,8 @@ object BotManagerStorage {
                 botManager.exchangeMarket,
                 botManager.status,
                 botManager.apiKey,
-                botManager.secretKey
+                botManager.secretKey,
+                botManager.openPosition
             )
         )
     }
@@ -87,6 +89,7 @@ object BotManagerStorage {
                 botManager.status = bot.status
                 botManager.apiKey = bot.apiKey
                 botManager.secretKey = bot.secretKey
+                botManager.openPosition = bot.openPosition
                 // BotManager güncellendiğinde diğer işlemleri yapabilirsiniz (örneğin, yeniden başlatma)
             } else {
                 // Yeni bir BotManager oluştur
@@ -100,7 +103,8 @@ object BotManagerStorage {
                     bot.exchangeMarket,
                     bot.status,
                     bot.apiKey,
-                    bot.secretKey
+                    bot.secretKey,
+                    bot.openPosition
                 )
                 botManagers[bot.id] = botManager
             }

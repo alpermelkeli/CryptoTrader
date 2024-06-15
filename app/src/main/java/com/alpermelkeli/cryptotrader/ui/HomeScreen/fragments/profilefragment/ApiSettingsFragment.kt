@@ -45,7 +45,7 @@ class ApiSettingsFragment : Fragment() {
         val editTextSecretKey = dialogView.findViewById<EditText>(R.id.secretKeyEdittext)
         val buttonAddApi = dialogView.findViewById<Button>(R.id.addApiButtonEdittext)
 
-        val dialog = AlertDialog.Builder(requireContext(),R.style.AddBotButtonDialog)
+        val dialog = AlertDialog.Builder(requireContext(),R.style.TransparentBackgroundDialog)
             .setView(dialogView)
             .create()
 

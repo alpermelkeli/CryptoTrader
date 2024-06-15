@@ -10,5 +10,6 @@ data class BotEntity(
     val exchangeMarket: String,
     val status: String,
     val apiKey: String,
-    val secretKey: String
+    val secretKey: String,
+    val openPosition: Boolean
 )

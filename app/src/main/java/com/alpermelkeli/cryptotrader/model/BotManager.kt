@@ -16,15 +16,20 @@ class BotManager(
     var exchangeMarket: String,
     var status: String,
     var apiKey: String,
-    var secretKey: String
+    var secretKey: String,
+    var openPosition:Boolean
 ) {
     private val binanceAccountOperations = BinanceAccountOperations(apiKey,secretKey)
     private val thresholdManager: ThresholdManager = ThresholdManager()
-    var openPosition: Boolean = false
     private var webSocketManager: BinanceWebSocketManager? = null
 
     fun start() {
-        thresholdManager.setBuyThreshold(pairName, threshold)
+        if(openPosition){
+            thresholdManager.setSellThreshold(pairName, threshold)
+        }
+        else{
+            thresholdManager.setBuyThreshold(pairName, threshold)
+        }
 
         val listener: BinanceWebSocketListener = object : BinanceWebSocketListener() {
             override fun onPriceUpdate(price: String) {
@@ -41,6 +46,7 @@ class BotManager(
 
         if (openPosition) {
             thresholdManager.setSellThreshold(pairName, threshold)
+            thresholdManager.removeBuyThreshold(pairName)
         }
         else {
             thresholdManager.setBuyThreshold(pairName, threshold)

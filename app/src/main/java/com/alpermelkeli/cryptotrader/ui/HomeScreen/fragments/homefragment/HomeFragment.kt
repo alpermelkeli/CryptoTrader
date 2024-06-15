@@ -3,7 +3,6 @@ package com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.homefragment
 import com.alpermelkeli.cryptotrader.model.BotManager
 import android.app.AlertDialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,14 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.Manifest
-import android.content.pm.PackageManager
 import android.widget.Button
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startForegroundService
-import androidx.lifecycle.lifecycleScope
+import android.widget.TextView
 import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
+import com.google.android.material.materialswitch.MaterialSwitch
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
@@ -60,7 +56,7 @@ class HomeFragment : Fragment() {
         tradingBots = mutableListOf()
 
         for((id,botManager) in BotManagerStorage.getBotManagers()){
-            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName))
+            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName, if(botManager.openPosition) "sellBuy" else "buySell"))
         }
 
         adapter = TradingBotsAdapter(tradingBots,
@@ -72,15 +68,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun showRemoveDialog(tradingBot: TradingBot) {
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("Botu Sil")
-            .setMessage("${tradingBot.pairName} botunu silmek istediğinizden emin misiniz?")
-            .setPositiveButton("Evet") { _, _ ->
-                removeTradingBot(tradingBot)
-            }
-            .setNegativeButton("Hayır", null)
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_remove_bot, null)
+        val textView = dialogView.findViewById<TextView>(R.id.removeBotText)
+        val confirmButton = dialogView.findViewById<Button>(R.id.confirmRemoveButton)
+        val cancelButton = dialogView.findViewById<Button>(R.id.cancelRemoveButton)
+        val dialog = AlertDialog.Builder(context,R.style.TransparentBackgroundDialog)
+            .setView(dialogView)
             .create()
+        textView.setText("${tradingBot.id} silmek istediğinizden emin misiniz?")
         dialog.show()
+
+        confirmButton.setOnClickListener{
+            removeTradingBot(tradingBot)
+            dialog.dismiss()
+        }
+        cancelButton.setOnClickListener{
+            dialog.dismiss()
+        }
     }
 
     private fun removeTradingBot(tradingBot: TradingBot) {
@@ -102,12 +107,13 @@ class HomeFragment : Fragment() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_bot, null)
         val firstPairNameEditText = dialogView.findViewById<EditText>(R.id.firstPairEditText)
         val secondPairNameEditText = dialogView.findViewById<EditText>(R.id.secondPairEditText)
-        val thresholdEditText = dialogView.findViewById<EditText>(R.id.thresholdEditText)
-        val amountEditText = dialogView.findViewById<EditText>(R.id.amountEditText)
+        val exchangeMarketEditText = dialogView.findViewById<EditText>(R.id.exchangeMarketEditText)
+        val buySellSwitch = dialogView.findViewById<MaterialSwitch>(R.id.buySellSwitch)
         val positiveButton = dialogView.findViewById<Button>(R.id.addBotButton)
         val negativeButton = dialogView.findViewById<Button>(R.id.cancelAddBotButton)
 
-        val dialog = AlertDialog.Builder(context,R.style.AddBotButtonDialog)
+
+        val dialog = AlertDialog.Builder(context,R.style.TransparentBackgroundDialog)
             .setView(dialogView)
             .create()
 
@@ -118,22 +124,23 @@ class HomeFragment : Fragment() {
             val firstPairName = firstPairNameEditText.text.toString().uppercase().trim()
             val secondPairName = secondPairNameEditText.text.toString().uppercase().trim()
             val pairName =  firstPairName + secondPairName
-            val threshold = thresholdEditText.text.toString().toDoubleOrNull()
-            val amount = amountEditText.text.toString().toDoubleOrNull()
+            val exchangeMarket = exchangeMarketEditText.text.toString().uppercase().trim()
+            val threshold = 0.0
+            val amount = 0.0
 
-            if (pairName.isNotEmpty() && threshold != null && amount != null) {
+            if (pairName.isNotEmpty() && exchangeMarket.isNotEmpty()) {
                 val id = generateBotId()
-                val newBot = TradingBot(id, R.drawable.btc_vector, "BINANCE", "Active", firstPairName, secondPairName, pairName)
+
+                val newBot = TradingBot(id, R.drawable.btc_vector, exchangeMarket, "Passive", firstPairName, secondPairName, pairName,if(buySellSwitch.isChecked) "sellBuy" else "buySell")
 
                 tradingBots.add(newBot)
 
                 adapter.notifyItemInserted(tradingBots.size - 1)
 
-                val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Active", binanceAccountOperations.apI_KEY, binanceAccountOperations.apI_SECRET)
+                val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Passive", binanceAccountOperations.apI_KEY, binanceAccountOperations.apI_SECRET,buySellSwitch.isChecked)
 
                 BotManagerStorage.addBotManager(botManager)
 
-                startTradingBot(id)
                 dialog.dismiss()
             }
         }
@@ -148,9 +155,7 @@ class HomeFragment : Fragment() {
     }
 
 
-    private fun startTradingBot(id: String) {
-        BotService.startBot(id)
-    }
+
 
     private fun updateAccountBalance() {
         CoroutineScope(Dispatchers.IO).launch {

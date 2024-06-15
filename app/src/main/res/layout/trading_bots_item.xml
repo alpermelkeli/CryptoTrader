@@ -3,7 +3,7 @@
     android:layout_width="380dp"
     android:layout_height="48dp"
     android:layout_margin="16dp"
-    android:background="#00000000"
+    android:background="@color/fragment_background_color"
     >
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,6 @@
         <LinearLayout
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="40dp"
             android:orientation="vertical"
             >
             <TextView
@@ -46,9 +45,27 @@
                 android:textColor="@color/white"
                 android:textAlignment="center"/>
         </LinearLayout>
-        
         <LinearLayout
-            android:layout_width="130dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="@color/white"
+                android:text="Bot tipi"
+                android:textAlignment="center"/>
+            <TextView
+                android:id="@+id/botTypeText"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:text="BuySell"
+                android:textColor="#00B670"
+                android:textAlignment="center"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -65,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:textColor="#00B670"
-                android:text="Aktif"
+                android:text="Active"
                 android:textAlignment="textEnd"
                 android:paddingEnd="20dp"/>
 

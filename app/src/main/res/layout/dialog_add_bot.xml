@@ -26,27 +26,24 @@
         android:textColor="@color/white"
         android:textColorHint="#737272"
         android:layout_height="wrap_content"
-        android:hint="2.Coin Adı" />
+        android:hint="2.Coin adı" />
 
     <EditText
-        android:id="@+id/thresholdEditText"
+        android:id="@+id/exchangeMarketEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textColorHint="#737272"
         android:backgroundTint="#00FFFFFF"
-        android:hint="Eşik Değeri"
+        android:hint="Borsa adı"
         android:inputType="numberDecimal" />
 
-    <EditText
-        android:id="@+id/amountEditText"
-        android:layout_width="match_parent"
-        android:textColor="@color/white"
-        android:textColorHint="#737272"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#00FFFFFF"
-        android:hint="İşlem Miktarı"
-        android:inputType="numberDecimal" />
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/buySellSwitch"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        />
 
     <LinearLayout
         android:layout_width="300dp"

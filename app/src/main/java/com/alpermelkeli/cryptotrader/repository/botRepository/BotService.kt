@@ -93,32 +93,34 @@ class BotService : Service() {
         super.onDestroy()
         println("Service destroyed.")
     }
+    /*
+    This function doesn't use because update function can control this.
+     */
     private fun startBot(id: String) {
         val botManager = botManagers[id]!!
         botManager.start()
         botManager.status = "Active"
         BotManagerStorage.updateBotManager(id, botManager)
-        Toast.makeText(applicationContext, "Bot started", Toast.LENGTH_LONG).show()
+        Toast.makeText(applicationContext, "Bot started.", Toast.LENGTH_LONG).show()
             Log.d("BotService", "Bot $id started")
-        botManagers = BotManagerStorage.getBotManagers()
+        botManagers[id] = botManager
     }
     private fun updateBot(id: String, amount: Double, threshold: Double) {
         val botManager = botManagers[id]!!
         if(botManager.status=="Active"){
             botManager.update(amount, threshold)
-            Toast.makeText(application, "Bot updated", Toast.LENGTH_LONG).show()
+            Toast.makeText(application, "Bot updated.", Toast.LENGTH_LONG).show()
             Log.d("BotService", "Bot $id updated")
         }
         else{
             botManager.amount = amount
             botManager.threshold = threshold
-            botManager.openPosition = false
             botManager.start()
             botManager.status = "Active"
-            Toast.makeText(application, "Bot started again", Toast.LENGTH_LONG).show()
+            Toast.makeText(application, "Bot initialized and resumed.", Toast.LENGTH_LONG).show()
         }
         BotManagerStorage.updateBotManager(id, botManager)
-        botManagers = BotManagerStorage.getBotManagers()
+        botManagers[id] = botManager
     }
     private fun stopBot(id: String) {
         val botManager = botManagers[id]!!
@@ -127,7 +129,7 @@ class BotService : Service() {
         BotManagerStorage.updateBotManager(id, botManager)
         Toast.makeText(applicationContext, "Bot stopped", Toast.LENGTH_LONG).show()
         Log.d("BotService", "Bot $id stopped")
-        botManagers = BotManagerStorage.getBotManagers()
+        botManagers[id] = botManager
     }
     private fun stopAllBots() {
         CoroutineScope(Dispatchers.IO).launch {

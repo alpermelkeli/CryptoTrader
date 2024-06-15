@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AddBotButtonDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="TransparentBackgroundDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>

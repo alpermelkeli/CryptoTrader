@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class BotDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         private const val DATABASE_NAME = "bots.db"
-        private const val DATABASE_VERSION = 4  // Versiyon güncellendi
+        private const val DATABASE_VERSION = 5  // Versiyon güncellendi
 
         private const val TABLE_NAME = "bots"
         private const val COLUMN_ID = "id"
@@ -20,42 +20,49 @@ class BotDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
         private const val COLUMN_STATUS = "status"
         private const val COLUMN_API_KEY = "apiKey"
         private const val COLUMN_SECRET_KEY = "secretKey"
+        private const val COLUMN_OPEN_POSITION = "openPosition"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         val createTable = """
-            CREATE TABLE $TABLE_NAME (
-                $COLUMN_ID TEXT PRIMARY KEY,
-                $COLUMN_FIRST_PAIR_NAME TEXT,
-                $COLUMN_SECOND_PAIR_NAME TEXT,
-                $COLUMN_PAIR_NAME TEXT,
-                $COLUMN_THRESHOLD REAL,
-                $COLUMN_AMOUNT REAL,
-                $COLUMN_EXCHANGE_MARKET TEXT,
-                $COLUMN_STATUS TEXT,
-                $COLUMN_API_KEY TEXT,
-                $COLUMN_SECRET_KEY TEXT
-            )
-        """
+        CREATE TABLE $TABLE_NAME (
+            $COLUMN_ID TEXT PRIMARY KEY,
+            $COLUMN_FIRST_PAIR_NAME TEXT,
+            $COLUMN_SECOND_PAIR_NAME TEXT,
+            $COLUMN_PAIR_NAME TEXT,
+            $COLUMN_THRESHOLD REAL,
+            $COLUMN_AMOUNT REAL,
+            $COLUMN_EXCHANGE_MARKET TEXT,
+            $COLUMN_STATUS TEXT,
+            $COLUMN_API_KEY TEXT,
+            $COLUMN_SECRET_KEY TEXT,
+            $COLUMN_OPEN_POSITION INTEGER
+        )
+    """
         db.execSQL(createTable)
     }
 
+
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 4) {  // Versiyon kontrolü
+        if (oldVersion < 4) {
             db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_API_KEY TEXT")
             db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_SECRET_KEY TEXT")
+        }
+        if (oldVersion < 5) {
+            db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_OPEN_POSITION INTEGER")
         }
     }
 
     fun insertBot(bot: BotEntity) {
         val db = writableDatabase
         val insertQuery = """
-            INSERT OR REPLACE INTO $TABLE_NAME ($COLUMN_ID, $COLUMN_FIRST_PAIR_NAME, $COLUMN_SECOND_PAIR_NAME, $COLUMN_PAIR_NAME, $COLUMN_THRESHOLD, $COLUMN_AMOUNT, $COLUMN_EXCHANGE_MARKET, $COLUMN_STATUS, $COLUMN_API_KEY, $COLUMN_SECRET_KEY)
-            VALUES ('${bot.id}', '${bot.firstPairName}', '${bot.secondPairName}', '${bot.pairName}', ${bot.threshold}, ${bot.amount}, '${bot.exchangeMarket}', '${bot.status}', '${bot.apiKey}', '${bot.secretKey}')
-        """
+        INSERT OR REPLACE INTO $TABLE_NAME ($COLUMN_ID, $COLUMN_FIRST_PAIR_NAME, $COLUMN_SECOND_PAIR_NAME, $COLUMN_PAIR_NAME, $COLUMN_THRESHOLD, $COLUMN_AMOUNT, $COLUMN_EXCHANGE_MARKET, $COLUMN_STATUS, $COLUMN_API_KEY, $COLUMN_SECRET_KEY, $COLUMN_OPEN_POSITION)
+        VALUES ('${bot.id}', '${bot.firstPairName}', '${bot.secondPairName}', '${bot.pairName}', ${bot.threshold}, ${bot.amount}, '${bot.exchangeMarket}', '${bot.status}', '${bot.apiKey}', '${bot.secretKey}', ${if (bot.openPosition) 1 else 0})
+    """
         db.execSQL(insertQuery)
         db.close()
     }
+
 
     fun getAllBots(): List<BotEntity> {
         val bots = mutableListOf<BotEntity>()
@@ -74,7 +81,20 @@ class BotDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
                 val status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS))
                 val apiKey = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_API_KEY))
                 val secretKey = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SECRET_KEY))
-                val bot = BotEntity(id, firstPairName, secondPairName, pairName, threshold, amount, exchangeMarket, status, apiKey, secretKey)
+                val openPosition = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_OPEN_POSITION)) == 1
+                val bot = BotEntity(
+                    id,
+                    firstPairName,
+                    secondPairName,
+                    pairName,
+                    threshold,
+                    amount,
+                    exchangeMarket,
+                    status,
+                    apiKey,
+                    secretKey,
+                    openPosition
+                )
                 bots.add(bot)
             } while (cursor.moveToNext())
         }
@@ -98,12 +118,26 @@ class BotDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
             val status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS))
             val apiKey = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_API_KEY))
             val secretKey = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SECRET_KEY))
-            bot = BotEntity(id, firstPairName, secondPairName, pairName, threshold, amount, exchangeMarket, status, apiKey, secretKey)
+            val openPosition = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_OPEN_POSITION)) == 1
+            bot = BotEntity(
+                id,
+                firstPairName,
+                secondPairName,
+                pairName,
+                threshold,
+                amount,
+                exchangeMarket,
+                status,
+                apiKey,
+                secretKey,
+                openPosition
+            )
         }
         cursor.close()
         db.close()
         return bot
     }
+
 
     fun removeBotById(id: String) {
         val db = writableDatabase
