@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.R
 import com.alpermelkeli.cryptotrader.databinding.FragmentHomeBinding
 import com.alpermelkeli.cryptotrader.model.TradingBot
-import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
 import com.alpermelkeli.cryptotrader.ui.HomeScreen.fragments.adapter.TradingBotsAdapter
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.alpermelkeli.cryptotrader.repository.apiRepository.ApiStorage
 import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.google.android.material.materialswitch.MaterialSwitch
@@ -108,6 +108,7 @@ class HomeFragment : Fragment() {
         val firstPairNameEditText = dialogView.findViewById<EditText>(R.id.firstPairEditText)
         val secondPairNameEditText = dialogView.findViewById<EditText>(R.id.secondPairEditText)
         val exchangeMarketEditText = dialogView.findViewById<EditText>(R.id.exchangeMarketEditText)
+        val switchText = dialogView.findViewById<TextView>(R.id.switchText)
         val buySellSwitch = dialogView.findViewById<MaterialSwitch>(R.id.buySellSwitch)
         val positiveButton = dialogView.findViewById<Button>(R.id.addBotButton)
         val negativeButton = dialogView.findViewById<Button>(R.id.cancelAddBotButton)
@@ -119,6 +120,9 @@ class HomeFragment : Fragment() {
 
         dialog.show()
 
+        buySellSwitch.setOnCheckedChangeListener { _, isChecked ->
+            updateSwitch(isChecked, buySellSwitch, switchText)
+        }
 
         positiveButton.setOnClickListener {
             val firstPairName = firstPairNameEditText.text.toString().uppercase().trim()
@@ -150,13 +154,15 @@ class HomeFragment : Fragment() {
 
     }
 
+
     private fun generateBotId(): String {
         return "BOT_" + System.currentTimeMillis().toString()
     }
-
-
-
-
+    private fun updateSwitch(isChecked: Boolean, switch: MaterialSwitch, switchTextView: TextView) {
+        val trackColor = if (isChecked) R.color.red else R.color.green
+        if(isChecked) switchTextView.setText("SellBuy") else switchTextView.setText("BuySell")
+        switch.trackTintList = ContextCompat.getColorStateList(requireContext(), trackColor)
+    }
     private fun updateAccountBalance() {
         CoroutineScope(Dispatchers.IO).launch {
             val balance = binanceAccountOperations.accountBalance

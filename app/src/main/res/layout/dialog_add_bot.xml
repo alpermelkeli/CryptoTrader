@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="15dp"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@drawable/configure_bot_component_background"
-    >
+    android:background="@drawable/configure_bot_component_background">
 
     <EditText
         android:id="@+id/firstPairEditText"
@@ -36,13 +36,23 @@
         android:textColorHint="#737272"
         android:backgroundTint="#00FFFFFF"
         android:hint="Borsa adı"
-        android:inputType="numberDecimal" />
+        />
+    <TextView
+        android:id="@+id/switchText"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="BuySell"
+        android:fontFamily="@font/lato_bold"
+        android:textAlignment="center"
+        android:textColor="@color/white"/>
 
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/buySellSwitch"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
+        app:thumbTint="@color/fragment_background_color"
+        app:trackTint="@color/green"
         />
 
     <LinearLayout

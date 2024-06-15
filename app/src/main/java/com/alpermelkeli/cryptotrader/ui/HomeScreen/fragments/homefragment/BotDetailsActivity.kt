@@ -80,8 +80,8 @@ class BotDetailsActivity : AppCompatActivity() {
             binding.pairText.text = pairName
             binding.firstPairText.text = firstPairName
             binding.secondPairText.text = secondPairName
-            binding.amountEditText.setText(amount.toString())
-            binding.thresholdEditText.setText(threshold.toString())
+            binding.amountEditText.hint = "%.6f".format(amount)//amount.toString()
+            binding.thresholdEditText.hint = "%.6f".format(threshold)//threshold.toString()
         }
     }
     private fun setUpTradeHistoryRecycler(pairName:String){
