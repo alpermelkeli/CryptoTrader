@@ -74,14 +74,16 @@ class BotDetailsActivity : AppCompatActivity() {
             val pairName = botManager.pairName
             val amount = botManager.amount
             val threshold = botManager.threshold
+            val openPosition = botManager.openPosition
             getPairsQuantities(firstPairName,secondPairName)
             setUpTradeHistoryRecycler(pairName)
             binding.botIdText.text = id
             binding.pairText.text = pairName
             binding.firstPairText.text = firstPairName
             binding.secondPairText.text = secondPairName
-            binding.amountEditText.hint = "%.6f".format(amount)//amount.toString()
-            binding.thresholdEditText.hint = "%.6f".format(threshold)//threshold.toString()
+            binding.amountEditText.setText(amount.toString())
+            binding.thresholdEditText.setText(threshold.toString())
+            binding.openPositionText.text = if(openPosition) "Pozisyon Açık" else "Pozisyon Kapalı"
         }
     }
     private fun setUpTradeHistoryRecycler(pairName:String){

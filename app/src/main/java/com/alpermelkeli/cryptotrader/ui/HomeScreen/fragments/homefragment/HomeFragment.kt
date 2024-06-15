@@ -51,12 +51,15 @@ class HomeFragment : Fragment() {
             setupRecyclerView()
         }
     }
-
     private fun setupRecyclerView() {
         tradingBots = mutableListOf()
 
+        /*
+        TODO: LOOK HERE.
+         */
+
         for((id,botManager) in BotManagerStorage.getBotManagers()){
-            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName, if(botManager.openPosition) "sellBuy" else "buySell"))
+            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName,"botType"))
         }
 
         adapter = TradingBotsAdapter(tradingBots,
@@ -66,7 +69,6 @@ class HomeFragment : Fragment() {
         binding.manuelBotsRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.manuelBotsRecyclerView.adapter = adapter
     }
-
     private fun showRemoveDialog(tradingBot: TradingBot) {
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_remove_bot, null)
@@ -87,7 +89,6 @@ class HomeFragment : Fragment() {
             dialog.dismiss()
         }
     }
-
     private fun removeTradingBot(tradingBot: TradingBot) {
         val position = tradingBots.indexOf(tradingBot)
         if (position != -1) {
@@ -96,13 +97,11 @@ class HomeFragment : Fragment() {
             BotManagerStorage.removeBotManager(tradingBot.id)
         }
     }
-
     private fun setupButtonListeners() {
         binding.newTradeBotButton.setOnClickListener {
             showAddBotDialog()
         }
     }
-
     private fun showAddBotDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_bot, null)
         val firstPairNameEditText = dialogView.findViewById<EditText>(R.id.firstPairEditText)
@@ -135,13 +134,13 @@ class HomeFragment : Fragment() {
             if (pairName.isNotEmpty() && exchangeMarket.isNotEmpty()) {
                 val id = generateBotId()
 
-                val newBot = TradingBot(id, R.drawable.btc_vector, exchangeMarket, "Passive", firstPairName, secondPairName, pairName,if(buySellSwitch.isChecked) "sellBuy" else "buySell")
+                val newBot = TradingBot(id, R.drawable.btc_vector, exchangeMarket, "Passive", firstPairName, secondPairName, pairName, if(buySellSwitch.isChecked) "sellBuy" else "buySell")
 
                 tradingBots.add(newBot)
 
                 adapter.notifyItemInserted(tradingBots.size - 1)
 
-                val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, "BINANCE", "Passive", binanceAccountOperations.apI_KEY, binanceAccountOperations.apI_SECRET,buySellSwitch.isChecked)
+                val botManager = BotManager(id, firstPairName, secondPairName, pairName, threshold, amount, exchangeMarket, "Passive", binanceAccountOperations.apI_KEY, binanceAccountOperations.apI_SECRET,buySellSwitch.isChecked)
 
                 BotManagerStorage.addBotManager(botManager)
 
@@ -153,8 +152,6 @@ class HomeFragment : Fragment() {
         }
 
     }
-
-
     private fun generateBotId(): String {
         return "BOT_" + System.currentTimeMillis().toString()
     }
@@ -171,7 +168,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
     private fun openBotDetailsActivity(tradingBot: TradingBot) {
         val intent = Intent(context, BotDetailsActivity::class.java).apply {
             putExtra("id", tradingBot.id)
@@ -183,7 +179,6 @@ class HomeFragment : Fragment() {
         }
         startActivity(intent)
     }
-
     private fun initializeAccountOperations() {
         CoroutineScope(Dispatchers.IO).launch {
             ApiStorage.initialize(requireContext())
@@ -196,7 +191,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
     private fun onAccountOperationsInitialized() {
         BotManagerStorage.initialize(requireContext())
         setupRecyclerView()

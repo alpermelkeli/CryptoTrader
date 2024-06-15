@@ -56,6 +56,16 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:fontFamily="@font/lato_bold" />
+            <TextView
+                android:id="@+id/openPositionText"
+                android:layout_width="163dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                android:text="Pozisyon: "
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/lato_bold" />
 
             <!-- Pair Text -->
             <TextView

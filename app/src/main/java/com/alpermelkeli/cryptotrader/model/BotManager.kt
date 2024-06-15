@@ -2,6 +2,7 @@ package com.alpermelkeli.cryptotrader.model
 
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.repository.botRepository.ThresholdManager
+import com.alpermelkeli.cryptotrader.repository.botRepository.ram.BotManagerStorage
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceAccountOperations
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager
 import com.alpermelkeli.cryptotrader.repository.cryptoApi.Binance.BinanceWebSocketManager.BinanceWebSocketListener
@@ -73,6 +74,7 @@ class BotManager(
                 .thenAccept { success: Boolean ->
                     if (success) {
                         openPosition = true
+                        BotManagerStorage.updateBotManager(id, this)
                         thresholdManager.setSellThreshold(pairName, buyThreshold)
                         thresholdManager.removeBuyThreshold(pairName)
                         println("Buy order executed successfully.")
@@ -98,6 +100,7 @@ class BotManager(
                 .thenAccept { success: Boolean ->
                     if (success) {
                         openPosition = false
+                        BotManagerStorage.updateBotManager(id, this)
                         thresholdManager.removeSellThreshold(pairName)
                         thresholdManager.setBuyThreshold(pairName, threshold)
                         println("Sell order executed successfully.")
@@ -114,8 +117,5 @@ class BotManager(
                     null
                 }
         }
-
     }
-
-
 }
