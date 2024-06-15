@@ -9,6 +9,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alpermelkeli.cryptotrader.databinding.ActivityBotDetailsBinding
@@ -29,6 +30,7 @@ class BotDetailsActivity : AppCompatActivity() {
     private lateinit var binanceAccountOperations : BinanceAccountOperations
     private lateinit var adapter: TradesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);

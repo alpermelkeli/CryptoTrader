@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.alpermelkeli.cryptotrader.databinding.ActivityMainBinding
 import com.alpermelkeli.cryptotrader.repository.botRepository.BotService
 import com.alpermelkeli.cryptotrader.ui.LoginScreen.LoginRegister
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_FOREGROUND_PERMISSION = 1
     private val REQUEST_DATA_SYNC_PERMISSION = 2
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
