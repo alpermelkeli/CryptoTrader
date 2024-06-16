@@ -53,13 +53,13 @@ class HomeFragment : Fragment() {
     }
     private fun setupRecyclerView() {
         tradingBots = mutableListOf()
-
+        
         /*
         TODO: LOOK HERE.
          */
 
         for((id,botManager) in BotManagerStorage.getBotManagers()){
-            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName,"botType"))
+            tradingBots.add(TradingBot(id, R.drawable.btc_vector, botManager.exchangeMarket, botManager.status, botManager.firstPairName, botManager.secondPairName, botManager.pairName,if(botManager.openPosition) "Açık" else "Kapalı"))
         }
 
         adapter = TradingBotsAdapter(tradingBots,
@@ -134,7 +134,7 @@ class HomeFragment : Fragment() {
             if (pairName.isNotEmpty() && exchangeMarket.isNotEmpty()) {
                 val id = generateBotId()
 
-                val newBot = TradingBot(id, R.drawable.btc_vector, exchangeMarket, "Passive", firstPairName, secondPairName, pairName, if(buySellSwitch.isChecked) "sellBuy" else "buySell")
+                val newBot = TradingBot(id, R.drawable.btc_vector, exchangeMarket, "Passive", firstPairName, secondPairName, pairName, if(buySellSwitch.isChecked) "Açık" else "Kapalı")
 
                 tradingBots.add(newBot)
 

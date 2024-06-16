@@ -14,7 +14,7 @@ class TradingBotViewHolder(itemView: View,
     val coinImage: ImageView = itemView.findViewById(R.id.coinImage)
     val exchangeMarketText: TextView = itemView.findViewById(R.id.exchangeMarketText)
     val activeText: TextView = itemView.findViewById(R.id.activeText)
-    val botTypeText: TextView = itemView.findViewById(R.id.botTypeText)
+    val botPositionText: TextView = itemView.findViewById(R.id.botPoisitionText)
 
     init {
         itemView.setOnClickListener {

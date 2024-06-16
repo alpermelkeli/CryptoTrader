@@ -54,13 +54,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:textColor="@color/white"
-                android:text="Bot tipi"
+                android:text="Pozisyon"
                 android:textAlignment="center"/>
             <TextView
-                android:id="@+id/botTypeText"
+                android:id="@+id/botPoisitionText"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:text="BuySell"
+                android:text="Açık"
                 android:textColor="#00B670"
                 android:textAlignment="center"/>
         </LinearLayout>

@@ -11,5 +11,5 @@ data class TradingBot(
         val firstPairName: String,
         val secondPairName:String,
         val pairName: String,
-        val type:String
+        val position:String
 )

@@ -30,8 +30,8 @@ class TradingBotsAdapter(
         holder.exchangeMarketText.text = bot.exchangeMarket
         if(bot.status=="Passive") holder.activeText.setTextColor(Color.RED) else holder.activeText.setTextColor(Color.GREEN)
         holder.activeText.text = bot.status
-        holder.botTypeText.text = bot.type
-        if(bot.type=="buySell") holder.botTypeText.setTextColor(Color.GREEN) else holder.botTypeText.setTextColor(Color.RED)
+        holder.botPositionText.text = bot.position
+        if(bot.position=="Açık") holder.botPositionText.setTextColor(Color.GREEN) else holder.botPositionText.setTextColor(Color.RED)
     }
 
     override fun getItemCount(): Int = tradingBots.size
